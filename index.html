@@ -6,9 +6,41 @@
 
     <body>
         <p>Hello, D3 world!</p>
+        <input type="file" id="files"  names="files[]" multiple />
+        <output id="list" ></output>
     </body>
 
     <script>
-        d3.select("body").append("span").text("Let's show some data!");
+     function handleFileSelect(evt) {
+         if (window.File && window.FileReader && window.FileList && window.Blob) {
+             var files = evt.target.files; // FileList object
+
+             // files is a FileList of File objects. List some properties.
+             var output = [];
+             for (var i = 0, f; f = files[i]; i++) {
+                 output.push('<li><strong>', escape(f.name), '</strong> (', f.type || 'n/a',') -',
+                              f.size, ' bytes, last modified: ',
+                              f.lastModifiedDate ?
+                              f.lastModifiedDate.toLocaleDateString() : 'n/a',
+                              '</li>');
+                 var reader = new FileReader();
+                 reader.onload = (function(theFile) {
+                     return function(e) {
+                         csv_obj = d3.csvParse(e.target.result);
+                         console.log(csv_obj);
+                     };
+                 })(f);
+                 reader.readAsText(f);
+             }
+             document.getElementById('list').innerHTML = '<ul>' + output.join('') + '</ul>';
+
+         } else {
+             alert('The File APIs are not fully supported in this browser.');
+         }
+     }
+
+     document.getElementById('files').addEventListener('change', handleFileSelect, false);
+
+     d3.select("body").append("span").text("Let's show some data!");
     </script>
 </html>
