@@ -2,45 +2,66 @@
 <html>
     <head>
         <script type="text/javascript" src="lib/d3.min.js"></script>
+        <script type="text/javascript" src="src/main.js"></script>
     </head>
 
     <body>
         <p>Hello, D3 world!</p>
         <input type="file" id="files"  names="files[]" multiple />
         <output id="list" ></output>
+        <table>
+            <tr>
+                <td>Name Party 1:</td>
+                <td>
+                    <input name="b_name_input" id="b_name_input" type="text" value="Bob" />
+                </td>
+            </tr>
+            <tr>
+                <td>Name Party 2:</td>
+                <td>
+                    <input name="k_name_input" id="k_name_input" type="text" value="Kate" />
+                </td>
+            </tr>
+            <tr>
+                <td>Id Party 1:</td>
+                <td>
+                    <input name="b_ids_input" id="b_ids_input" type="text" value="23" />
+                </td>
+            </tr>
+            <tr>
+                <td>Id Party 2:</td>
+                <td>
+                    <input name="k_ids_input" id="k_ids_input" type="text" value="20" />
+                </td>
+            </tr>
+        </table>
+
+
+        <p id="num_msgs">Total Number of Messages</p>
     </body>
 
     <script>
-     function handleFileSelect(evt) {
-         if (window.File && window.FileReader && window.FileList && window.Blob) {
-             var files = evt.target.files; // FileList object
+     var k_ids = [document.getElementById("k_ids_input").value];
+     var b_ids = [document.getElementById("b_ids_input").value];
+     var b_name = document.getElementById("b_name_input").value;
+     var k_name = document.getElementById("k_name_input").value;
 
-             // files is a FileList of File objects. List some properties.
-             var output = [];
-             for (var i = 0, f; f = files[i]; i++) {
-                 output.push('<li><strong>', escape(f.name), '</strong> (', f.type || 'n/a',') -',
-                              f.size, ' bytes, last modified: ',
-                              f.lastModifiedDate ?
-                              f.lastModifiedDate.toLocaleDateString() : 'n/a',
-                              '</li>');
-                 var reader = new FileReader();
-                 reader.onload = (function(theFile) {
-                     return function(e) {
-                         csv_obj = d3.csvParse(e.target.result);
-                         console.log(csv_obj);
-                     };
-                 })(f);
-                 reader.readAsText(f);
-             }
-             document.getElementById('list').innerHTML = '<ul>' + output.join('') + '</ul>';
+     document.getElementById('k_ids_input').oninput = function() {
+         k_ids = string_to_int_array(document.getElementById('k_ids_input').value);
+     };
 
-         } else {
-             alert('The File APIs are not fully supported in this browser.');
-         }
-     }
+     document.getElementById('b_ids_input').oninput = function() {
+         b_ids = string_to_int_array(document.getElementById('b_ids_input').value);
+     };
+
+     document.getElementById('b_name_input').oninput = function() {
+         b_name = document.getElementById('b_name_input').value;
+     };
+
+     document.getElementById('k_name_input').oninput = function() {
+         k_name = document.getElementById('k_name_input').value;
+     };
 
      document.getElementById('files').addEventListener('change', handleFileSelect, false);
-
-     d3.select("body").append("span").text("Let's show some data!");
     </script>
 </html>
