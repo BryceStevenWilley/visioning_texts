@@ -16,10 +16,14 @@ function split_b_k(data) {
     var k_rows = [];
     for (var i = 0, row; row = data[i]; i++) {
         if (b_ids.includes(row.TYPE)) {
-            b_rows.push(row);
+            b_rows.push({'ID' : row.ID,
+                         'BODY' : row.BODY,
+                         'date' : new Date(parseInt(row.DATE_SENT, 10))});
         }
         else if (k_ids.includes(row.TYPE)) {
-            k_rows.push(row);
+            k_rows.push({'ID' : row.ID,
+                         'BODY' : row.BODY,
+                         'date' : new Date(parseInt(row.DATE_SENT, 10))});
         }
     }
 
@@ -42,6 +46,24 @@ function total_to_from_chars(split_data) {
     return [total_chars(split_data.b_rows), total_chars(split_data.k_rows)];
 }
 
+function x_y_time_of_day_msg(data) {
+    all_hours = {};
+    for (var i = 0; i < 24; i++) {
+        all_hours[i] = 0;
+    }
+
+    return data.map(function(item) {
+        return item.date.getHours();
+    }).reduce(function(histo, hour) {
+        histo[hour] = +histo[hour] + 1;
+        return histo;
+    }, all_hours);
+}
+
+// TODO: write a function that gets the min/max date
+// TODO: write a map-reduce that increments msg count/char count
+//       for all dates between min/max
+
 function handleFileSelect(evt) {
     if (window.File && window.FileReader && window.FileList && window.Blob) {
         var files = evt.target.files; // FileList object
@@ -61,6 +83,8 @@ function handleFileSelect(evt) {
                     split_data = split_b_k(csv_obj);
                     msgs_split = total_to_from_messages(split_data);
                     chars_split = total_to_from_chars(split_data);
+                    time_of_days = x_y_time_of_day_msg(split_data.b_rows);
+                    console.log(time_of_days);
                     d3.select("#num_msgs").append("span").html(
                         '<br/>' + b_name +  ': ' + msgs_split[0] + ', ' + chars_split[0] + ' chars' +
                         '<br/>' + k_name + ': ' + msgs_split[1] + ', ' + chars_split[1] + ' chars');
