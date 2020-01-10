@@ -153,8 +153,42 @@ function set_graph_2(data) {
     t.exit().remove();
 }
 
-function set_graph_3_4(data) {
-    let word_count_map = word_count(data);
+function set_graph_3(word_count_map) {
+    let simple_words = ['the', 'and', 'And', 'a', 'to', 'was', 'is', 'of', 'but'];
+    let word_count_smaller = word_count_map.map(function(n_d) {
+        return {
+            'name' : n_d.name,
+            'word_count' : n_d.word_count.filter(function(d) {
+                return !simple_words.includes(d[1]);
+            })
+        };
+    });
+
+    let u1 = d3.select('#graph3')
+        .selectAll('div')
+        .data(word_count_smaller);
+    u1.enter()
+        .append('div')
+        .merge(u1)
+        .attr('id', function(d) {
+            return 'section3_' + d.name;
+        })
+        .html(function(d) {
+            return '<h2>' + d.name + '</h2>';
+        });
+    u1.exit().remove();
+
+
+    word_count_smaller.forEach(function(elem) {
+        elem.word_count.sort(function(i1, i2) {
+            return parseInt(i2[0], 10) - parseInt(i1[0], 10);
+        });
+    });
+
+    console.log(word_count_smaller);
+}
+
+function set_graph_4(word_count_map) {
 
     // TODO: remove too common stuff
     // TODO: sort data
@@ -172,9 +206,38 @@ function set_graph_3_4(data) {
         };
     });
 
-    console.log(emoji_count);
-    // TODO: sort data
-    // TODO: attach to text, arranged somehow
+    let u1 = d3.select('#graph4')
+        .selectAll('div')
+        .data(emoji_count);
+    u1.enter()
+        .append('div')
+        .merge(u1)
+        .attr('id', function(d) {
+            return 'section4_' + d.name;
+        })
+        .html(function(d) {
+            return '<h2>' + d.name + '</h2>';
+        });
+    u1.exit().remove();
+
+    emoji_count.forEach(function(elem) {
+        elem.emoji_count.sort(function(i1, i2) {
+            return parseInt(i2[0], 10) - parseInt(i1[0], 10);
+        });
+        let u = d3.select('#section4_' + elem.name)
+            .selectAll('p')
+            .data(elem.emoji_count);
+        u.enter()
+            .append('p')
+            .merge(u)
+            .style('font-size', function(d) {
+                return d[0] + 'px';
+            })
+            .text(function(d) {
+                return d[1];
+            });
+        u.exit().remove();
+    });
 }
 
 function handleFileSelect(evt) {
@@ -202,7 +265,9 @@ function handleFileSelect(evt) {
                     set_graph_0(data);
                     set_graph_1(data);
                     set_graph_2(data);
-                    set_graph_3_4(data);
+                    let word_count_map = word_count(data);
+                    set_graph_3(word_count_map);
+                    set_graph_4(word_count_map);
                 };
             })(f);
             reader.readAsText(f);
