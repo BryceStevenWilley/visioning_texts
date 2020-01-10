@@ -2,8 +2,15 @@
 <html>
     <head>
         <script type="text/javascript" src="lib/d3.min.js"></script>
-        <script type="text/javascript" src="src/main.js"></script>
+        <script type="text/javascript" src="src/math.js"></script>
+        <script type="text/javascript" src="src/graphs.js"></script>
     </head>
+
+    <style>
+        text {
+            text-anchor: end;
+        }
+    </style>
 
     <body>
         <p>Hello, D3 world!</p>
@@ -36,16 +43,39 @@
             </tr>
         </table>
 
+        <div id="graph0_wrapper">
+            <p id="num_msgs">Total Number of Messages</p>
+            <svg width="760"  height="140" >
+                <g id="graph0_bars" transform="translate(70, 30)" >
+                </g>
+                <g id="graph0_labels" transform="translate(70, 30)" >
+                </g>
+            </svg>
+        </div>
 
-        <p id="num_msgs">Total Number of Messages</p>
+        <div id="graph1_wrapper" >
+            <p id="num_msgs">Mesages per time of day</p>
+            <svg id="graph1" width="1300"  height="500">
+                <g id="graph1_bars">
+                </g>
+                <g id="graph1_labels">
+                </g>
+            </svg>
+        </div>
+
+        <div id="graph2_wrapper" >
+            <p> Messages over the year</p>
+            <svg id="graph2" width="760"  height="20" >
+                <g id="graph2_bars" transform="translate(70, 0)" >
+                </g>
+                <g id="graph2_labels" transform="translate(70, 0)">
+                </g>
+            </svg>
+        </div>
+
     </body>
 
     <script>
-     var k_ids = [document.getElementById("k_ids_input").value];
-     var b_ids = [document.getElementById("b_ids_input").value];
-     var b_name = document.getElementById("b_name_input").value;
-     var k_name = document.getElementById("k_name_input").value;
-
      document.getElementById('k_ids_input').oninput = function() {
          k_ids = string_to_int_array(document.getElementById('k_ids_input').value);
      };
