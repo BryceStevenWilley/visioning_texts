@@ -153,9 +153,28 @@ function set_graph_2(data) {
     t.exit().remove();
 }
 
-function set_graph_3(data) {
+function set_graph_3_4(data) {
     let word_count_map = word_count(data);
-    console.log(word_count_map);
+
+    // TODO: remove too common stuff
+    // TODO: sort data
+    // TODO: cut off to top 100,
+    // TODO: attach to text, arranged somehow.
+
+    var emoji_regex = /[\u{1f300}-\u{1f5ff}\u{1f900}-\u{1f9ff}\u{1f600}-\u{1f64f}\u{1f680}-\u{1f6ff}\u{2600}-\u{26ff}\u{2700}-\u{27bf}\u{1f1e6}-\u{1f1ff}\u{1f191}-\u{1f251}\u{1f004}\u{1f0cf}\u{1f170}-\u{1f171}\u{1f17e}-\u{1f17f}\u{1f18e}\u{3030}\u{2b50}\u{2b55}\u{2934}-\u{2935}\u{2b05}-\u{2b07}\u{2b1b}-\u{2b1c}\u{3297}\u{3299}\u{303d}\u{00a9}\u{00ae}\u{2122}\u{23f3}\u{24c2}\u{23e9}-\u{23ef}\u{25b6}\u{23f8}-\u{23fa}]/ug;
+
+    let emoji_count = word_count_map.map(function(n_d) {
+        return {
+            'name' : n_d.name,
+            'emoji_count' : n_d.word_count.filter(function(d) {
+                return emoji_regex.test(d[1]);
+            })
+        };
+    });
+
+    console.log(emoji_count);
+    // TODO: sort data
+    // TODO: attach to text, arranged somehow
 }
 
 function handleFileSelect(evt) {
@@ -183,7 +202,7 @@ function handleFileSelect(evt) {
                     set_graph_0(data);
                     set_graph_1(data);
                     set_graph_2(data);
-                    set_graph_3(data);
+                    set_graph_3_4(data);
                 };
             })(f);
             reader.readAsText(f);

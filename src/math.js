@@ -122,10 +122,10 @@ function word_count(data) {
                 histo[word] = histo[word] ? +histo[word] + 1 : 1;
                 return histo;
             }, {});
-        var result = {}, key;
+        var result = [], key;
         for (key in word_counts) {
             if (word_counts.hasOwnProperty(key) && word_counts[key] > 5) {
-                result[key] = word_counts[key];
+                result.push([word_counts[key], key]);
             }
         }
 
