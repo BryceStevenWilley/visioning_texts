@@ -189,27 +189,53 @@ function set_graph_3(word_count_map) {
             return parseInt(i2[0], 10) - parseInt(i1[0], 10);
         });
     });
-
-    console.log(word_count_smaller);
 }
 
 function set_graph_4(word_count_map) {
+    let emoji_count = emoji_filter(word_count_map);
+    let emoji_count_b = emoji_count[0].emoji_count;
+    console.log(emoji_count_b);
+
+    var width = 500;
+    var height = 500;
+    var simulation = d3.forceSimulation(emoji_count_b)
+        .force('charge', d3.forceManyBody().strength(20))
+        .force('center', d3.forceCenter(width / 2, height / 2))
+        .force('collision', d3.forceCollide().radius(function(d) {
+            return 1.2 * d[0];
+        }))
+        .on('tick', ticked);
+
+    function ticked() {
+        var u = d3.select('#graph4')
+            .selectAll('g')
+            .data(emoji_count_b);
+
+        u.enter()
+            .append('g')
+            .html(function(d) {
+                let emoji_size = 1.2 * d[0];
+                let font_size = emoji_size * 1.7;
+                let scoot = font_size / 2.55;
+                return '<circle fill="white" r="' + emoji_size + '"/>' +
+                    '<text x="' + emoji_size + '" y="' + scoot + '" font-size=\"' + font_size + '\">' + d[1] + '</text';
+            })
+            .merge(u)
+            .attr('transform', function(d) {
+                return 'translate(' + d.x + ',' + d.y + ')';
+            });
+        u.exit().remove();
+    }
+}
+
+function set_graph_4_list(word_count_map) {
 
     // TODO: remove too common stuff
     // TODO: sort data
     // TODO: cut off to top 100,
     // TODO: attach to text, arranged somehow.
 
-    var emoji_regex = /[\u{1f300}-\u{1f5ff}\u{1f900}-\u{1f9ff}\u{1f600}-\u{1f64f}\u{1f680}-\u{1f6ff}\u{2600}-\u{26ff}\u{2700}-\u{27bf}\u{1f1e6}-\u{1f1ff}\u{1f191}-\u{1f251}\u{1f004}\u{1f0cf}\u{1f170}-\u{1f171}\u{1f17e}-\u{1f17f}\u{1f18e}\u{3030}\u{2b50}\u{2b55}\u{2934}-\u{2935}\u{2b05}-\u{2b07}\u{2b1b}-\u{2b1c}\u{3297}\u{3299}\u{303d}\u{00a9}\u{00ae}\u{2122}\u{23f3}\u{24c2}\u{23e9}-\u{23ef}\u{25b6}\u{23f8}-\u{23fa}]/ug;
-
-    let emoji_count = word_count_map.map(function(n_d) {
-        return {
-            'name' : n_d.name,
-            'emoji_count' : n_d.word_count.filter(function(d) {
-                return emoji_regex.test(d[1]);
-            })
-        };
-    });
+    let emoji_count = emoji_filter(word_count_map);
 
     let u1 = d3.select('#graph4')
         .selectAll('div')
