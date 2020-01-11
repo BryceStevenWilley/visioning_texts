@@ -56,7 +56,7 @@ function set_graph_1(data) {
     }));
     var barScale = d3.scaleLinear().domain([0, maxFound]).range([0, maxBarHeight]);
 
-    var colors = ['blue', 'green'];
+    //var colors = ['blue', 'green'];
 
     var u = d3.select("#graph1_bars")
         .selectAll('rect')
@@ -75,14 +75,15 @@ function set_graph_1(data) {
             return barScale(d.texts) + 'px';
         })
         .attr('x', function(d) {
-            var temp = data.names.indexOf(d.name) * width;
-            return d.hour * width * 2 + 3 + temp;
+            //var temp = data.names.indexOf(d.name) * width;
+            //return d.hour * width * 2 + 3 + temp;
+            return d.hour * width + 3;
         })
         .attr('y', function(d, i) {
             return maxBarHeight - barScale(d.texts) + 'px';
         })
         .attr('fill', function(d) {
-            return colors[data.names.indexOf(d.name)];
+            return 'blue'; //colors[data.names.indexOf(d.name)];
         });
     u.exit().remove();
 
@@ -97,10 +98,11 @@ function set_graph_1(data) {
             return maxBarHeight + 13;
         })
         .attr('x', function(d, i) {
-            return d.hour * width * 2 + 3 + width;
+            //return d.hour * width * 2 + 3 + width;
+            return d.hour * width + 3 + width;
         })
         .text(function(d) {
-            return (data.names.indexOf(d.name) == 0) ? d.hour : '';
+            return d.hour; //(data.names.indexOf(d.name) == 0) ? d.hour : '';
         });
 }
 
@@ -112,9 +114,9 @@ function set_graph_2(data) {
     }));
     var barScale = d3.scaleLinear().domain([0, maxFound]).range([0, maxBarWidth]);
 
-    let height = 15;
+    let height = 3;
 
-    var colors = ['blue', 'green'];
+    //var colors = ['blue', 'green'];
 
     d3.select('#graph2')
         .attr('height', days_in_year.length * height);
@@ -130,11 +132,12 @@ function set_graph_2(data) {
             return barScale(d.texts) + 'px';
         })
         .attr('y', function(d) {
-            var temp = data.names.indexOf(d.name) * height;
-            return d.day_count * height * 2 + 3 + temp;
+            //var temp = data.names.indexOf(d.name) * height;
+            //return d.day_count * height * 2 + 3 + temp;
+            return d.day_count * height + 3;
         })
         .attr('fill', function(d) {
-            return colors[data.names.indexOf(d.name)];
+            return 'blue'; //colors[data.names.indexOf(d.name)];
         });
     u.exit().remove();
 
@@ -145,10 +148,12 @@ function set_graph_2(data) {
         .append('text')
         .merge(t)
         .attr('y', function(d) {
-            return d.day_count * height * 2 + 3 + height;
+            //return d.day_count * height * 2 + 3 + height;
+            return d.day_count * height + 3 + height;
         })
         .text(function(d) {
-            return (data.names.indexOf(d.name) == 0) ? d.date.toDateString() : '';
+            return (d.date.getDate() == 1) ? d.date.toDateString() : '';
+            //(data.names.indexOf(d.name) == 0) ? d.date.toDateString() : '';
         });
     t.exit().remove();
 }

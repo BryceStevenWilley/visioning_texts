@@ -47,6 +47,19 @@ function total_to_from_chars(split_data) {
 }
 
 function xy_time_of_day(data) {
+    let all_hours = [];
+    for (var i = 0; i < 24; i++) {
+        all_hours.push({'name' : 'both', 'hour' : i, 'texts' : 0});
+    }
+    return data.data.map(function(item) {
+        return item.date.getHours();
+    }).reduce(function(histo, hour) {
+        histo[hour].texts = +histo[hour].texts + 1;
+        return histo;
+    }, all_hours);
+}
+
+function xy_time_of_day_sep_person(data) {
     return data.names.map(function(n) {
         let all_hours = [];
         for (var i = 0; i < 24; i++) {
@@ -91,6 +104,18 @@ function step_dates(min_date, max_date, name) {
 }
 
 function xy_day_of_year(data) {
+    let min_max = min_max_date(data);
+
+    let all_days = step_dates(min_max[0], min_max[1], 'both');
+    return data.data.map(function(item) {
+        return Math.floor((item.date - min_max[0]) / milliseconds_in_day());
+    }).reduce(function(histo, day) {
+        histo[day].texts = +histo[day].texts + 1;
+        return histo;
+    }, all_days);
+}
+
+function xy_day_of_year_sep_person(data) {
     let min_max = min_max_date(data);
 
     return data.names.map(function(n) {
