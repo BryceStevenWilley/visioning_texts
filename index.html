@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
     <head>
+        <script type="text/javascript" src="lib/grapheme.js"></script>
         <script type="text/javascript" src="lib/d3.min.js"></script>
         <script type="text/javascript" src="src/math.js"></script>
         <script type="text/javascript" src="src/graphs.js"></script>
@@ -50,7 +51,11 @@
                 </g>
                 <g id="graph0_labels" transform="translate(70, 30)" >
                 </g>
+                <g id="graph0_annotations"  transform="translate(70, 30)" >
+                </g>
             </svg>
+            <div id="graph0_avgs">
+            </div>
         </div>
 
         <div id="graph1_wrapper" >
@@ -79,11 +84,9 @@
             </div>
         </div>
 
-        <div id="graph4_wrapper" >
+        <section id="graph4_wrapper" >
             <p> Top used Emoji's</p>
-            <svg id="graph4" width="500" height="500">
-            </svg >
-        </div>
+        </section>
 
     </body>
 
