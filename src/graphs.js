@@ -243,7 +243,7 @@ function set_graph_4(emoji_count) {
     var width = 500;
     var height = 500;
 
-    let emoji_scale = 5;
+    let emoji_scale = 900;
 
     let u = d3.select('#graph4_wrapper')
         .selectAll('div')
@@ -262,7 +262,7 @@ function set_graph_4(emoji_count) {
             .force('charge', d3.forceManyBody().strength(20))
             .force('center', d3.forceCenter(width / 2, height / 2))
             .force('collision', d3.forceCollide().radius(function(d) {
-                return emoji_scale * d[0] * 1.05;
+                return Math.sqrt(emoji_scale * d[0]) / Math.PI * 1.05;
             }))
             .on('tick', ticked);
 
@@ -273,11 +273,11 @@ function set_graph_4(emoji_count) {
             u.enter()
                 .append('g')
                 .html(function(d) {
-                    let emoji_size = emoji_scale * d[0];
-                    let font_size = emoji_size * 1.74;
+                    let emoji_rad = Math.sqrt(emoji_scale * d[0]) / Math.PI;
+                    let font_size = emoji_rad * 1.74;
                     let scoot_y = font_size / 2.78;
-                    let scoot_x = emoji_size * 1.1;
-                    return '<circle fill="white" r="' + emoji_size + '"/>' +
+                    let scoot_x = emoji_rad * 1.1;
+                    return '<circle fill="white" r="' + emoji_rad + '"/>' +
                         '<text x="' + scoot_x + '" y="' + scoot_y + '" font-size=\"' + font_size + '\">' + d[1] + '</text';
                 })
                 .merge(u)
