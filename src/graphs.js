@@ -74,11 +74,11 @@ function set_graph_0(data) {
     x.exit().remove();
 }
 
-function set_graph_1(data) {
-    var time_of_days = xy_time_of_day(data);
+function set_graph_1(data, day) {
+    let filtered_times = xy_time_filter(data, day);
 
     var maxBarHeight = 400;
-    var maxFound = Math.max(...time_of_days.map(function(item) {
+    var maxFound = Math.max(...filtered_times.map(function(item) {
         return item.texts;
     }));
     var barScale = d3.scaleLinear().domain([0, maxFound]).range([0, maxBarHeight]);
@@ -87,12 +87,12 @@ function set_graph_1(data) {
 
     var u = d3.select("#graph1_bars")
         .selectAll('rect')
-        .data(time_of_days);
+        .data(filtered_times);
 
     let width = 20;
 
-    d3.select('#graph2')
-        .attr('width', time_of_days.length * width);
+    d3.select('#graph1')
+        .attr('width', data.length * width);
 
     u.enter()
         .append('rect')
@@ -116,7 +116,7 @@ function set_graph_1(data) {
 
     var t = d3.select('#graph1_labels')
         .selectAll('text')
-        .data(time_of_days);
+        .data(filtered_times);
 
     t.enter()
         .append('text')
@@ -185,42 +185,56 @@ function set_graph_2(data) {
     t.exit().remove();
 }
 
-function set_graph_3(word_count_map) {
-    // TODO: remove too common stuff
+function set_graph_3(word_count_less) {
     // TODO: sort data
     // TODO: cut off to top 100,
     // TODO: attach to text, arranged somehow.
 
-    let simple_words = ['the', 'and', 'And', 'a', 'to', 'was', 'is', 'of', 'but'];
-    let word_count_smaller = word_count_map.map(function(n_d) {
-        return {
-            'name' : n_d.name,
-            'word_count' : n_d.word_count.filter(function(d) {
-                return !simple_words.includes(d[1]);
-            })
-        };
+    let word_count_even_less = word_count_less.filter(function(item) {
+        return Math.abs(item[0]) > 0.4;
     });
 
-    let u1 = d3.select('#graph3')
-        .selectAll('div')
-        .data(word_count_smaller);
+    console.log(word_count_even_less);
+    word_count_even_less.sort(function(i1, i2) {
+        return i1[0] - i2[0];
+    });
+
+    let height = 20;
+
+    d3.select('#graph3')
+        .attr('height', (word_count_even_less.length + 2) * height);
+
+    let u1 = d3.select('#graph3_bars')
+        .selectAll('rect')
+        .data(word_count_even_less);
     u1.enter()
-        .append('div')
+        .append('rect')
         .merge(u1)
-        .attr('id', function(d) {
-            return 'section3_' + d.name;
+        .attr('height', height - 1)
+        .attr('width', function(d) {
+            return Math.abs(100 * d[0]);
         })
-        .html(function(d) {
-            return '<h2>' + d.name + '</h2>';
+        .attr('x', function(d) {
+            return Math.min(100 * d[0], 0);
+        })
+        .attr('y', function(d, i) {
+            return i * 20;
         });
     u1.exit().remove();
 
-
-    word_count_smaller.forEach(function(elem) {
-        elem.word_count.sort(function(i1, i2) {
-            return parseInt(i2[0], 10) - parseInt(i1[0], 10);
+    let t = d3.select('#graph3_labels')
+        .selectAll('text')
+        .data(word_count_even_less);
+    t.enter()
+        .append('text')
+        .merge(u1)
+        .attr('fill', 'green')
+        .attr('y', function(d, i) {
+            return i * 20;
+        }).text(function(d) {
+            return d[1];
         });
-    });
+    t.exit().remove();
 }
 
 function set_graph_4(emoji_count) {
@@ -280,36 +294,41 @@ function handleFileSelect(evt) {
         var files = evt.target.files; // FileList object
 
         // files is a FileList of File objects. List some properties.
-        var output = [];
-        for (var i = 0, f; f = files[i]; i++) {
-            output.push('<li><strong>', escape(f.name), '</strong> (', f.type || 'n/a',') =',
-                        f.size, ' bytes, last modified: ',
-                        f.lastModifiedDate ?
-                        f.lastModifiedDate.toLocaleDateString() : 'n/a',
-                        '</li>');
-            var reader = new FileReader();
-            reader.onload = (function(theFile) {
-                return function(e) {
-                    var b_name = document.getElementById("b_name_input").value;
-                    var k_name = document.getElementById("k_name_input").value;
-                    var b_ids = string_to_int_array(document.getElementById('b_ids_input').value);
-                    var k_ids = string_to_int_array(document.getElementById('k_ids_input').value);
-
-                    csv_obj = d3.csvParse(e.target.result);
-                    data = split_b_k(csv_obj, b_ids, k_ids, b_name, k_name);
-                    set_graph_0(data);
-                    set_graph_1(data);
-                    set_graph_2(data);
-                    let word_count_map = word_count_full(data);
-                    set_graph_3(word_count_less(word_count_map));
-                    set_graph_4(emoji_filter(word_count_map));
-                };
-            })(f);
-            reader.readAsText(f);
-        }
-        document.getElementById('list').innerHTML = '<ul>' + output.join('') + '</ul>';
-
+        file_to_read = files[0];
+        let f = file_to_read;
+        document.getElementById('list').innerHTML = '<ul>' +
+            '<li><strong>' + escape(f.name) + '</strong> (' +  (f.type || 'n/a') + '),' +
+            f.size + ' bytes, last modified: ' +
+            (f.lastModifiedDate ?
+             f.lastModifiedDate.toLocaleDateString() : 'n/a') +
+            '</li></ul>';
     } else {
         alert('The File APIs are not fully supported in this browser.');
     }
+}
+
+function trigger_process(f) {
+    var reader = new FileReader();
+    reader.onload = (function(theFile) {
+        return function(e) {
+            var b_name = document.getElementById("b_name_input").value;
+            var k_name = document.getElementById("k_name_input").value;
+            var b_ids = string_to_int_array(document.getElementById('b_ids_input').value);
+            var k_ids = string_to_int_array(document.getElementById('k_ids_input').value);
+            csv_obj = d3.csvParse(e.target.result);
+            data = split_b_k(csv_obj, b_ids, k_ids, b_name, k_name);
+            set_graph_0(data);
+            time_of_days = xy_time_of_day(data);
+            set_graph_1(time_of_days, -1);
+            set_graph_2(data);
+            let word_count_map = word_count_full(data);
+            set_graph_3(word_count_less_diff(word_count_map));
+            set_graph_4(emoji_filter(word_count_map));
+        };
+    })(f);
+    reader.readAsText(f);
+}
+
+function day_select(day) {
+    set_graph_1(time_of_days, day);
 }

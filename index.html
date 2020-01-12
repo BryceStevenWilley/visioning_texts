@@ -43,6 +43,7 @@
                 </td>
             </tr>
         </table>
+        <button type="button" onclick="trigger_process(file_to_read)">Show Data!</button>
 
         <div id="graph0_wrapper">
             <p id="num_msgs">Total Number of Messages</p>
@@ -60,12 +61,21 @@
 
         <div id="graph1_wrapper" >
             <p id="num_msgs">Mesages per time of day</p>
-            <svg id="graph1" width="1300"  height="500">
+            <svg id="graph1" width="1300"  height="450">
                 <g id="graph1_bars">
                 </g>
                 <g id="graph1_labels">
                 </g>
             </svg>
+
+            <button type="button" onclick="day_select(-1)">All</button>
+            <button type="button" onclick="day_select(1)">Mon</button>
+            <button type="button" onclick="day_select(2)">Tues</button>
+            <button type="button" onclick="day_select(3)">Wed</button>
+            <button type="button" onclick="day_select(4)">Thur</button>
+            <button type="button" onclick="day_select(5)">Fri</button>
+            <button type="button" onclick="day_select(6)">Sat</button>
+            <button type="button" onclick="day_select(0)">Sun</button>
         </div>
 
         <div id="graph2_wrapper" >
@@ -80,8 +90,14 @@
 
         <div id="graph3_wrapper" >
             <p> Top used words</p>
-            <div id="graph3">
-            </div>
+            <svg id="graph3" width="760" height="700">
+                <g id="graph3_bars" transform="translate(70, 30)" >
+                </g>
+                <g id="graph3_labels" transform="translate(70, 30)" >
+                </g>
+                <g id="graph3_annotations"  transform="translate(70, 30)" >
+                </g>
+            </svg>
         </div>
 
         <section id="graph4_wrapper" >
@@ -108,5 +124,7 @@
      };
 
      document.getElementById('files').addEventListener('change', handleFileSelect, false);
+     var file_to_read;
+     var time_of_days = [];
     </script>
 </html>

@@ -48,16 +48,26 @@ function total_to_from_data(data) {
 }
 
 function xy_time_of_day(data) {
-    let all_hours = [];
-    for (var i = 0; i < 24; i++) {
-        all_hours.push({'name' : 'both', 'hour' : i, 'texts' : 0});
+    let all_times= [];
+    for (var i = 0; i < 24 * 7; i++) {
+        all_times.push({'name' : 'both',
+                        'hour_day_hash' : i,
+                        'hour' : i % 24,
+                        'day' : Math.floor(i / 24),
+                        'texts' : 0});
     }
     return data.data.map(function(item) {
-        return item.date.getHours();
-    }).reduce(function(histo, hour) {
-        histo[hour].texts = +histo[hour].texts + 1;
+        return item.date.getHours() + item.date.getDay() * 24;
+    }).reduce(function(histo, hash) {
+        histo[hash].texts = +histo[hash].texts + 1;
         return histo;
-    }, all_hours);
+    }, all_times);
+}
+
+function xy_time_filter(data, day) {
+    return data.filter(function(d) {
+        return (day == -1) ? true : d.day == day;
+    });
 }
 
 function xy_time_of_day_sep_person(data) {
@@ -140,29 +150,69 @@ function word_count_full(data) {
             return row.name == n;
         }).map(word_split).reduce(word_reduce, [])
             .reduce(function(histo, word) {
-                histo[word] = histo[word] ? +histo[word] + 1 : 1;
+                let word_lower = word.toLowerCase();
+                histo[word_lower] = histo[word_lower] ? +histo[word_lower] + 1 : 1;
                 return histo;
             }, {});
         return {'name' : n, 'word_count' : word_counts};
     });
 }
 
-function word_count_less(word_count_map) {
-    return word_count_map.map(function(n) {
-        let result = [], key;
+var emoji_rgx = /[\u{1f300}-\u{1f5ff}\u{1f900}-\u{1f9ff}\u{1f600}-\u{1f64f}\u{1f680}-\u{1f6ff}\u{2600}-\u{26ff}\u{2700}-\u{27bf}\u{1f1e6}-\u{1f1ff}\u{1f191}-\u{1f251}\u{1f004}\u{1f0cf}\u{1f170}-\u{1f171}\u{1f17e}-\u{1f17f}\u{1f18e}\u{3030}\u{2b50}\u{2b55}\u{2934}-\u{2935}\u{2b05}-\u{2b07}\u{2b1b}-\u{2b1c}\u{3297}\u{3299}\u{303d}\u{00a9}\u{00ae}\u{2122}\u{23f3}\u{24c2}\u{23e9}-\u{23ef}\u{25b6}\u{23f8}-\u{23fa}]/ug;
+
+function word_count_less_diff(word_count_map) {
+    let simple_words = ['the', 'and', 'And', 'a', 'to', 'was', 'is', 'of', 'but'];
+
+    let smaller = word_count_map.map(function(n) {
+        let tmp_map = {}, key;
         for (key in n.word_count) {
-            if (n.word_count.hasOwnProperty(key) && n.word_count[key] > 5) {
-                result.push([n.word_count[key], key]);
+            if (n.word_count.hasOwnProperty(key) && n.word_count[key] > 5
+                && !simple_words.includes(key) && !emoji_rgx.test(key)) {
+                tmp_map[key] = n.word_count[key];
             }
         }
-        return {'name' : n, 'word_count' : result};
+        return {'name' : n.name, 'word_count' : tmp_map};
     });
+
+    // Assumption of exactly 2 people
+    let min_alone = 10;
+
+    let diff = smaller.reduce(function(total, n) {
+        if (Object.keys(total).length == 0) {
+            return n.word_count;
+        }
+        var tmp_combine = {}, key;
+        for (key in n.word_count) {
+            if (n.word_count.hasOwnProperty(key)) {
+                if (total.hasOwnProperty(key)) {
+                    let diff_val = total[key] - n.word_count[key];
+                    tmp_combine[key] = (diff_val) /
+                        Math.max(total[key], n.word_count[key]);
+                } else {
+                    if (n.word_count[key] > min_alone) {
+                        tmp_combine[key] = -1;
+                    }
+                }
+            }
+        }
+        for (key in total) {
+            if (!n.word_count.hasOwnProperty(key) && total[key] > min_alone) {
+                tmp_combine[key] = 1;
+            }
+        }
+        return tmp_combine;
+    }, {});
+
+    let final_list = [], key;
+    for (key in diff) {
+        if (diff.hasOwnProperty(key)) {
+            final_list.push([diff[key], key]);
+        }
+    }
+    return final_list;
 }
 
-
 function emoji_filter(word_count_map) {
-    var emoji_rgx = /[\u{1f300}-\u{1f5ff}\u{1f900}-\u{1f9ff}\u{1f600}-\u{1f64f}\u{1f680}-\u{1f6ff}\u{2600}-\u{26ff}\u{2700}-\u{27bf}\u{1f1e6}-\u{1f1ff}\u{1f191}-\u{1f251}\u{1f004}\u{1f0cf}\u{1f170}-\u{1f171}\u{1f17e}-\u{1f17f}\u{1f18e}\u{3030}\u{2b50}\u{2b55}\u{2934}-\u{2935}\u{2b05}-\u{2b07}\u{2b1b}-\u{2b1c}\u{3297}\u{3299}\u{303d}\u{00a9}\u{00ae}\u{2122}\u{23f3}\u{24c2}\u{23e9}-\u{23ef}\u{25b6}\u{23f8}-\u{23fa}]/ug;
-
     var splitter = new GraphemeSplitter();
     return word_count_map.map(function(x) {
         let tmp_map = {}, key_word;
