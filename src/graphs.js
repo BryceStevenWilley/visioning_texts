@@ -194,7 +194,6 @@ function set_graph_3(word_count_less) {
         return Math.abs(item[0]) > 0.4;
     });
 
-    console.log(word_count_even_less);
     word_count_even_less.sort(function(i1, i2) {
         return i1[0] - i2[0];
     });
@@ -309,6 +308,7 @@ function handleFileSelect(evt) {
             (f.lastModifiedDate ?
              f.lastModifiedDate.toLocaleDateString() : 'n/a') +
             '</li></ul>';
+        d3.select('#input_table').classed('hide', false);
     } else {
         alert('The File APIs are not fully supported in this browser.');
     }
@@ -323,14 +323,18 @@ function trigger_process(f) {
             var b_ids = string_to_int_array(document.getElementById('b_ids_input').value);
             var k_ids = string_to_int_array(document.getElementById('k_ids_input').value);
             csv_obj = d3.csvParse(e.target.result);
-            data = split_b_k(csv_obj, b_ids, k_ids, b_name, k_name);
+            let data = split_b_k(csv_obj, b_ids, k_ids, b_name, k_name);
             set_graph_0(data);
-            time_of_days = xy_time_of_day(data);
-            set_graph_1(time_of_days, -1);
-            set_graph_2(data);
-            let word_count_map = word_count_full(data);
-            set_graph_3(word_count_less_diff(word_count_map));
-            set_graph_4(emoji_filter(word_count_map));
+            setTimeout(function() {
+                time_of_days = xy_time_of_day(data);
+                set_graph_1(time_of_days, -1);
+                set_graph_2(data);
+                setTimeout(function() {
+                    let word_count_map = word_count_full(data);
+                    set_graph_3(word_count_less_diff(word_count_map));
+                    set_graph_4(emoji_filter(word_count_map));
+                }, 10);
+            }, 10);
         };
     })(f);
     reader.readAsText(f);
