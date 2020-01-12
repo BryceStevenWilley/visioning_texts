@@ -68,8 +68,8 @@ function set_graph_0(data) {
     let x = d3.select('#graph0_avgs').selectAll('div').data([sums]);
     x.enter().append('div').merge(t)
         .text(function(d) {
-            return d.words / d.texts + ' average words per text, ' +
-                   d.chars / d.texts + ' average characters per text';
+            return (d.words / d.texts).toFixed(3) + ' average words per text, ' +
+                (d.chars / d.texts).toFixed(3) + ' average characters per text';
         });
     x.exit().remove();
 }
@@ -296,9 +296,16 @@ function handleFileSelect(evt) {
         // files is a FileList of File objects. List some properties.
         file_to_read = files[0];
         let f = file_to_read;
+        if (f.type != 'text/csv') {
+            alert('You need to upload a CSV file');
+            return;
+        }
+        let size_str = (f.size > 1000) ? (
+            (f.size > 1000000) ? (f.size / 1000000).toFixed(2) + 'MB' : (f.size / 1000).toFixed(2) + 'kB')
+            : f.size + 'bytes';
         document.getElementById('list').innerHTML = '<ul>' +
             '<li><strong>' + escape(f.name) + '</strong> (' +  (f.type || 'n/a') + '),' +
-            f.size + ' bytes, last modified: ' +
+            size_str + ', last modified: ' +
             (f.lastModifiedDate ?
              f.lastModifiedDate.toLocaleDateString() : 'n/a') +
             '</li></ul>';
