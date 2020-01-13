@@ -1,21 +1,19 @@
 <!DOCTYPE html>
 <html>
     <head>
+        <title>Signal Messages, Visualized</title>
         <script type="text/javascript" src="lib/grapheme.js"></script>
         <script type="text/javascript" src="lib/d3.min.js"></script>
         <script type="text/javascript" src="src/math.js"></script>
         <script type="text/javascript" src="src/graphs.js"></script>
+        <link rel="stylesheet"  href="css/stylesheet.css" typet="text/css" charset="utf-8"/>
     </head>
 
-    <style>
-        text {
-            text-anchor: end;
-        }
-    </style>
+    <style></style>
 
     <body>
-        <p>Hello, D3 world!</p>
-        <input type="file" id="files"  names="files[]" multiple />
+        <h1>Signal Messages, Visualized</h1>
+        <input type="file" id="file_select"  names="file[]"/>
         <output id="list" ></output>
         <table id="input_table" class="hide">
             <tr>
@@ -39,11 +37,15 @@
                 </td>
             </tr>
         </table>
-        <button type="button" onclick="trigger_process(file_to_read)">Show Data!</button>
+        <button type="button" id="show_button"
+                onclick="trigger_process(file_to_read)"
+                class="hide"
+                disabled>Show Data!</button>
 
+        <div class="hide">
         <div id="graph0_wrapper">
-            <p id="num_msgs">Total Number of Messages</p>
-            <svg width="760"  height="140" >
+            <h2 id="num_msgs">Total Number of Messages</h2>
+            <svg id="graph0" width="760"  height="20" >
                 <g id="graph0_bars" transform="translate(70, 30)" >
                 </g>
                 <g id="graph0_labels" transform="translate(70, 30)" >
@@ -56,8 +58,8 @@
         </div>
 
         <div id="graph1_wrapper" >
-            <p id="num_msgs">Mesages per time of day</p>
-            <svg id="graph1" width="1300"  height="450">
+            <h2 id="num_msgs">Mesages per time of day</h2>
+            <svg id="graph1" width="1300"  height="20">
                 <g id="graph1_bars">
                 </g>
                 <g id="graph1_labels">
@@ -75,52 +77,78 @@
         </div>
 
         <div id="graph2_wrapper" >
-            <p> Messages over the year</p>
+            <h2> Messages over the year</h2>
             <svg id="graph2" width="760"  height="20" >
-                <g id="graph2_bars" transform="translate(70, 0)" >
+                <g id="graph2_bars" >
                 </g>
-                <g id="graph2_labels" transform="translate(70, 0)">
+                <g id="graph2_labels">
                 </g>
+                <path id="graph2_path"></path>
             </svg>
+            <br/>
+            <label for="x_day_avg">Number of Days to average</label>
+            <input type="number" id="graph2_x_day_avg" name="x_day_avg" value="7" min="3" step="2" />
         </div>
 
         <div id="graph3_wrapper" >
-            <p> Top used words</p>
-            <svg id="graph3" width="760" height="700">
-                <g id="graph3_bars" transform="translate(70, 30)" >
+            <h2> Word Use Difference</h2>
+            <svg id="graph3" width="760" height="20">
+                <g id="graph3_bars" transform="translate(110, 30)" >
                 </g>
-                <g id="graph3_labels" transform="translate(70, 30)" >
+                <g id="graph3_labels" transform="translate(110, 30)" >
                 </g>
-                <g id="graph3_annotations"  transform="translate(70, 30)" >
+                <g id="graph3_annotations"  transform="translate(110, 30)" >
                 </g>
             </svg>
         </div>
 
         <section id="graph4_wrapper" >
-            <p> Top used Emoji's</p>
+            <h2> Top used Emoji's</h2>
         </section>
-
+        </div>
     </body>
 
     <script>
+     var file_to_read;
+     var b_name = 'Bob';
+     var b_ids = [23];
+     var k_name = 'Kate';
+     var k_ids = [20];
+     var time_of_days = [];
+     var days_in_year = [];
+
+     function refresh_show() {
+         if (k_ids.length != 0 && b_ids.length != 0 && b_name.length != 0 && k_name.length != 0) {
+             document.getElementById('show_button').disabled = false;
+         } else {
+             document.getElementById('show_button').disabled = true;
+         }
+     }
+
      document.getElementById('k_ids_input').oninput = function() {
          k_ids = string_to_int_array(document.getElementById('k_ids_input').value);
+         refresh_show();
      };
 
      document.getElementById('b_ids_input').oninput = function() {
          b_ids = string_to_int_array(document.getElementById('b_ids_input').value);
+         refresh_show();
      };
 
      document.getElementById('b_name_input').oninput = function() {
          b_name = document.getElementById('b_name_input').value;
+         refresh_show();
      };
 
      document.getElementById('k_name_input').oninput = function() {
          k_name = document.getElementById('k_name_input').value;
+         refresh_show();
      };
 
-     document.getElementById('files').addEventListener('change', handleFileSelect, false);
-     var file_to_read;
-     var time_of_days = [];
+     document.getElementById('graph2_x_day_avg').oninput = function() {
+         x_day_avg(document.getElementById('graph2_x_day_avg').value);
+     };
+
+     document.getElementById('file_select').addEventListener('change', handleFileSelect, false);
     </script>
 </html>
