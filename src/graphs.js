@@ -22,46 +22,55 @@ function set_graph_0(data) {
     var colors = ['#ffd90a', 'green'];
 
     d3.select('#graph0')
-        .attr('height', 140);
+        .attr('height', 210);
 
-    let u = d3.select('#graph0_bars').selectAll('rect').data(totals_data);
-    u.enter().append('rect').merge(u)
-        .attr('height', 19)
-        .attr('width', function(d) {
-            return barScale(d.texts) + 'px';
-        })
-        .attr('y', function(d, i) {
-            return i * 20;
-        })
-        .attr('fill', function(d) {
-            return colors[data.names.indexOf(d.name)];
+    var pieGenerator = d3.pie()
+        .value(function(d) {return d.texts;});
+
+    var arcGenerator = d3.arc()
+        .innerRadius(20)
+        .outerRadius(100);
+
+    var arcData = pieGenerator(totals_data);
+
+    let u = d3.select('#graph0_bars').selectAll('path').data(arcData);
+    u.enter().append('path').merge(u)
+        .attr('d', arcGenerator)
+        .attr('stroke', 'white')
+        .attr('fill', function(d, i) {
+            return colors[data.names.indexOf(d.data.name)];
         });
     u.exit().remove();
 
-    let t = d3.select('#graph0_labels').selectAll('text').data(totals_data);
+    let t = d3.select('#graph0_labels').selectAll('text').data(arcData);
     t.enter().append('text').merge(t)
-        .attr('y', function(d, i) {
-            return i * 20 + 13;
-        })
-        .attr('text-anchor', 'end')
         .attr('fill', 'white')
-        .text(function(d) {
-            return d.name;
+        .attr('text-anchor', 'middle')
+        .each(function(d) {
+            var centroid = arcGenerator.centroid(d);
+            d3.select(this)
+                .attr('x', centroid[0])
+                .attr('y', centroid[1])
+                .attr('dy', '0.33em')
+                .text(d.data.name);
         });
     t.exit().remove();
 
-    let t2 = d3.select('#graph0_annotations').selectAll('text').data(totals_data);
+    var annotationArcGenerator = d3.arc()
+        .innerRadius(100)
+        .outerRadius(150);
+
+    let t2 = d3.select('#graph0_annotations').selectAll('text').data(arcData);
     t2.enter().append('text').merge(t2)
-        .attr('y', function(d, i) {
-            return i * 20 + 13;
-        })
-        .attr('x', function(d) {
-            return barScale(d.texts) + d.texts.toString().length * 10;
-        })
         .attr('fill', 'white')
-        .attr('text-anchor', 'end')
-        .text(function(d) {
-            return d.texts;
+        .attr('text-anchor', 'middle')
+        .each(function(d) {
+            var centroid = annotationArcGenerator.centroid(d);
+            d3.select(this)
+                .attr('x', centroid[0])
+                .attr('y', centroid[1])
+                .attr('dy', '0.33em')
+                .text(d.data.texts);
         });
     t2.exit().remove();
 
@@ -85,10 +94,11 @@ function set_graph_1(data, day) {
     let filtered_times = xy_time_filter(data, day);
 
     var maxBarHeight = 400;
-    var maxFound = Math.max(...filtered_times.map(function(item) {
-        return item.texts;
-    }));
-    var barScale = d3.scaleLinear().domain([0, maxFound]).range([0, maxBarHeight]);
+    var maxAll = Math.max(...data.map(function(item) { return item.texts; }));
+    var maxFiltered = Math.max(...filtered_times.map(function(item) { return item.texts; }));
+    var maxFound = Math.max(maxAll, maxFiltered);
+    var barScale_height = d3.scaleLinear().domain([0, maxFound]).range([0, maxBarHeight]);
+    var barScale_place = d3.scaleLinear().domain([0, maxFound]).range([maxBarHeight, 0]);
 
     var u = d3.select("#graph1_bars")
         .selectAll('rect')
@@ -97,21 +107,19 @@ function set_graph_1(data, day) {
     let bar_width = 20;
 
     d3.select('#graph1')
-        .attr('width', data.length * bar_width)
+        .attr('width', filtered_times.length * bar_width + 28)
         .attr('height', maxBarHeight + 50);
 
-    u.enter()
-        .append('rect')
-        .merge(u)
-        .attr('width', bar_width)
+    u.enter().append('rect').merge(u)
+        .attr('width', bar_width - 1)
         .attr('height', function(d) {
-            return barScale(d.texts) + 'px';
+            return barScale_height(d.texts) + 'px';
         })
         .attr('x', function(d) {
             return d.hour * bar_width + 3;
         })
         .attr('y', function(d, i) {
-            return maxBarHeight - barScale(d.texts) + 'px';
+            return barScale_place(d.texts) + 'px';
         })
         .attr('fill', function(d) {
             return '#ffd90a';
@@ -127,15 +135,18 @@ function set_graph_1(data, day) {
         .merge(t)
         .attr('fill', 'white')
         .attr('y', function(d, i) {
-            return maxBarHeight + 13;
+            return maxBarHeight + 15;
         })
         .attr('x', function(d, i) {
-            return (d.hour + 1) * bar_width + 3;
+            return (d.hour + 1) * bar_width;
         })
         .attr('text-anchor', 'end')
         .text(function(d) {
             return d.hour;
         });
+
+    d3.select('#graph1_axis_left')
+        .call(d3.axisRight().scale(barScale_place));
 }
 
 function set_graph_2(data) {
@@ -186,64 +197,96 @@ function set_graph_2(data) {
         .attr('y', maxBarLength + 25)
         .text(function(d) {
             let options = {month: 'long'};
-            return (d.date.getDate() == 1 || d.day_count == 0) ? d.date.toLocaleDateString('en-US', options) : '';
+            return (d.date.getDate() == 1 || d.day_count == 0) ?
+                d.date.toLocaleDateString('en-US', options) : '';
         })
         .attr('text-anchor', 'start');
     t.exit().remove();
 
+    var barScale_place = d3.scaleLinear().domain([0, maxFound]).range([maxBarLength, 0]);
+    d3.select('#graph2_axis_left')
+        .call(d3.axisRight().scale(barScale_place));
+
     x_day_avg(7);
 }
 
-function set_graph_3(word_count_less) {
+function set_graph_3(word_count_less, names) {
     let word_count_even_less = word_count_less.filter(function(item) {
-        return Math.abs(item[0]) > 0.4;
+        return Math.abs(item[1]) > 20;
     });
 
-    word_count_even_less.sort(function(i1, i2) {
-        return i1[0] - i2[0];
+    let bin_count = 10;
+    var lin_scale = d3.scaleLinear().domain([-1, 1]).range([0, bin_count]);
+    let start_empty = [];
+    for (var i = 0; i < bin_count; i++) {
+        start_empty.push({'val' : lin_scale.invert(i), 'list' : []});
+    }
+    let chunk = word_count_even_less.reduce(function(total, item) {
+        let to_add = {'word' : item[2], 'total' : item[1]};
+        let tmp = Math.floor(lin_scale(item[0]));
+        if (tmp < total.length) {
+            total[tmp].list.push(to_add);
+        } else {
+            total[total.length - 1].list.push(to_add);
+        }
+
+        return total;
+    }, start_empty);
+
+    chunk.forEach(function(item) {
+        item.list.sort(function(i1, i2) {
+            return i1.total - i2.total;
+        });
     });
 
-    let height = 20;
+    let height = 1000;
+    let width = 1000;
+
+    var diffScale = d3.scaleLinear().domain([-1, 1]).range([0, width]);
+    var maxWordTotal = Math.max(...word_count_even_less.map(function(w) {return w[1];}));
+    var totalScale = d3.scaleLinear().domain([0, maxWordTotal]).range([height, 0]);
+    var colorScale = d3.scaleLinear().domain([-1, 1]).range(['#ffd90a', 'white']);
 
     d3.select('#graph3')
-        .attr('height', (word_count_even_less.length + 2) * height);
-
-    let u1 = d3.select('#graph3_bars')
-        .selectAll('rect')
-        .data(word_count_even_less);
-    u1.enter()
-        .append('rect')
-        .merge(u1)
-        .attr('fill', '#ffd90a')
-        .attr('height', height - 1)
-        .attr('width', function(d) {
-            return Math.abs(100 * d[0]);
-        })
-        .attr('x', function(d) {
-            return Math.min(100 * d[0], 0);
-        })
-        .attr('y', function(d, i) {
-            return i * 20;
-        });
-    u1.exit().remove();
+        .attr('height', height + 40)
+        .attr('width', width + 40);
 
     let t = d3.select('#graph3_labels')
         .selectAll('text')
-        .data(word_count_even_less);
+        .data(chunk);
     t.enter()
         .append('text')
         .merge(t)
-        .attr('alignment-baseline', 'hanging')
-        .attr('fill', 'white')
-        .attr('text-anchor', function(d) {
-            return d[0] < 0 ? 'start' : 'end';
+        .attr('alignment-baseline', 'middle')
+        .attr('fill', function(d) {
+            return colorScale(d.val);
         })
-        .attr('y', function(d, i) {
-            return i * 20;
-        }).text(function(d) {
-            return d[1];
+        .attr('text-anchor', 'middle')
+        .attr('transform', function(d) {
+            return 'translate(' + diffScale(d.val) + ',0)'; // + (totalScale(d[1]) + 10) + ')';
+        }).html(function(d) {
+            return d.list.reduce(function(all, item) {
+                return all + '<tspan x="0" dy="1.4em">' + item.word + '</tspan>';
+            }, '');
         });
     t.exit().remove();
+
+    var revScale = d3.scaleLinear().domain([-1, 1]).range([width, 0]);
+    let t2 = d3.select('#graph3_annotations').selectAll('text').data(names);
+    t2.enter()
+        .append('text')
+        .merge(t2)
+        .attr('fill', 'white')
+        .attr('text-anchor', 'middle')
+        .attr('transform', function(d, i) {
+            return 'translate(' + revScale((i - 0.5) * 2) + ',0)';
+        })
+        .text(function(d) {
+            return d;
+        });
+
+    d3.select('#graph3_axis_bottom')
+        .call(d3.axisBottom().scale(diffScale));
 }
 
 function set_graph_4(emoji_count) {
@@ -329,12 +372,13 @@ function trigger_process(f) {
     var reader = new FileReader();
     reader.onload = (function(theFile) {
         return function(e) {
+            let address_id = parseInt(document.getElementById('address_input').value, 10);
             let b_name = document.getElementById("b_name_input").value;
             let k_name = document.getElementById("k_name_input").value;
             let b_ids = string_to_int_array(document.getElementById('b_ids_input').value);
             let k_ids = string_to_int_array(document.getElementById('k_ids_input').value);
             csv_obj = d3.csvParse(e.target.result);
-            let data = split_b_k(csv_obj, b_ids, k_ids, b_name, k_name);
+            let data = split_b_k(csv_obj, b_ids, k_ids, b_name, k_name, address_id);
             set_graph_0(data);
             setTimeout(function() {
                 time_of_days = xy_time_of_day(data);
@@ -343,7 +387,7 @@ function trigger_process(f) {
                 set_graph_2(days_in_year);
                 setTimeout(function() {
                     let word_count_map = word_count_full(data);
-                    set_graph_3(word_count_less_diff(word_count_map));
+                    set_graph_3(word_count_less_diff(word_count_map), data.names);
                     set_graph_4(emoji_filter(word_count_map));
                 }, 10);
             }, 10);

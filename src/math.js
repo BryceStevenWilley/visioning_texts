@@ -1,7 +1,7 @@
-function split_b_k(data, b_ids, k_ids, b_name, k_name) {
+function split_b_k(data, b_ids, k_ids, b_name, k_name, address_id) {
     all_ids = b_ids.concat(k_ids);
     var full_data = data.filter(function(row) {
-        return all_ids.includes(row.TYPE);
+        return all_ids.includes(row.TYPE) && row.ADDRESS == address_id;
     }).map(function(row) {
         if (b_ids.includes(row.TYPE)) {
             return {'name' : b_name,
@@ -65,9 +65,22 @@ function xy_time_of_day(data) {
 }
 
 function xy_time_filter(data, day) {
-    return data.filter(function(d) {
-        return (day == -1) ? true : d.day == day;
-    });
+    if (day == -1) {
+        let all_times= [];
+        for (var i = 0; i < 24; i++) {
+            all_times.push({'name' : 'both',
+                            'hour' : i,
+                            'texts' : 0});
+        }
+        return data.reduce(function(histo, d) {
+            histo[d.hour].texts = +histo[d.hour].texts + d.texts;
+            return histo;
+        }, all_times);
+    } else {
+        return data.filter(function(d) {
+            return d.day == day;
+        });
+    }
 }
 
 function xy_time_of_day_sep_person(data) {
@@ -161,7 +174,9 @@ function word_count_full(data) {
 var emoji_rgx = /[\u{1f300}-\u{1f5ff}\u{1f900}-\u{1f9ff}\u{1f600}-\u{1f64f}\u{1f680}-\u{1f6ff}\u{2600}-\u{26ff}\u{2700}-\u{27bf}\u{1f1e6}-\u{1f1ff}\u{1f191}-\u{1f251}\u{1f004}\u{1f0cf}\u{1f170}-\u{1f171}\u{1f17e}-\u{1f17f}\u{1f18e}\u{3030}\u{2b50}\u{2b55}\u{2934}-\u{2935}\u{2b05}-\u{2b07}\u{2b1b}-\u{2b1c}\u{3297}\u{3299}\u{303d}\u{00a9}\u{00ae}\u{2122}\u{23f3}\u{24c2}\u{23e9}-\u{23ef}\u{25b6}\u{23f8}-\u{23fa}]/ug;
 
 function word_count_less_diff(word_count_map) {
-    let simple_words = ['the', 'and', 'And', 'a', 'to', 'was', 'is', 'of', 'but'];
+    let simple_words = ['the', 'and', 'And', 'a', 'to', 'was', 'is', 'of', 'but',
+                        'my', 'like', 'this', 'think', 'if', 'all', 'she', 'going', 'her',
+                        'i', 'you', 'that', 'it', 'be'];
 
     let smaller = word_count_map.map(function(n) {
         let tmp_map = {}, key;
@@ -186,18 +201,18 @@ function word_count_less_diff(word_count_map) {
             if (n.word_count.hasOwnProperty(key)) {
                 if (total.hasOwnProperty(key)) {
                     let diff_val = total[key] - n.word_count[key];
-                    tmp_combine[key] = (diff_val) /
-                        Math.max(total[key], n.word_count[key]);
+                    tmp_combine[key] = [diff_val,
+                        (total[key] + n.word_count[key])];
                 } else {
                     if (n.word_count[key] > min_alone) {
-                        tmp_combine[key] = -1;
+                        tmp_combine[key] = [-n.word_count[key], n.word_count[key]];
                     }
                 }
             }
         }
         for (key in total) {
             if (!n.word_count.hasOwnProperty(key) && total[key] > min_alone) {
-                tmp_combine[key] = 1;
+                tmp_combine[key] = [total[key], total[key]];
             }
         }
         return tmp_combine;
@@ -206,7 +221,7 @@ function word_count_less_diff(word_count_map) {
     let final_list = [], key;
     for (key in diff) {
         if (diff.hasOwnProperty(key)) {
-            final_list.push([diff[key], key]);
+            final_list.push([diff[key][0] / diff[key][1], diff[key][1], key]);
         }
     }
     return final_list;

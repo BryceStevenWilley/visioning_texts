@@ -12,10 +12,16 @@
     <style></style>
 
     <body>
-        <h1>Signal Messages, Visualized</h1>
+        <h1>Visoning Texts</h1>
         <input type="file" id="file_select"  names="file[]"/>
         <output id="list" ></output>
         <table id="input_table" class="hide">
+            <tr>
+                <td>Address: </td>
+                <td>
+                    <input name="address_input" id="address_input" type="text" value="171" />
+                </td>
+            </tr>
             <tr>
                 <td>Name 1:</td>
                 <td>
@@ -46,26 +52,23 @@
         <div id="graph0_wrapper">
             <h2 id="num_msgs">Total Number of Messages</h2>
             <svg id="graph0" width="760"  height="20" >
-                <g id="graph0_bars" transform="translate(70, 30)" >
-                </g>
-                <g id="graph0_labels" transform="translate(70, 30)" >
-                </g>
-                <g id="graph0_annotations"  transform="translate(70, 30)" >
-                </g>
+                <g id="graph0_bars" transform="translate(150, 100)" />
+                <g id="graph0_labels" transform="translate(150, 100)" />
+                <g id="graph0_annotations"  transform="translate(150, 100)" />
             </svg>
             <div id="graph0_avgs">
             </div>
         </div>
 
         <div id="graph1_wrapper" >
-            <h2 id="num_msgs">Mesages per time of day</h2>
+            <h2 id="num_msgs">Message count per hour</h2>
             <svg id="graph1" width="1300"  height="20">
-                <g id="graph1_bars">
-                </g>
-                <g id="graph1_labels">
-                </g>
+                <g id="graph1_bars" transform="translate(28, 0)" />
+                <g id="graph1_labels" transform="translate(28, 0)" />
+                <g id="graph1_axis_left" />
             </svg>
 
+            <br/>
             <button type="button" onclick="day_select(-1)">All</button>
             <button type="button" onclick="day_select(1)">Mon</button>
             <button type="button" onclick="day_select(2)">Tues</button>
@@ -77,13 +80,12 @@
         </div>
 
         <div id="graph2_wrapper" >
-            <h2> Messages over the year</h2>
+            <h2> Message Count over the year</h2>
             <svg id="graph2" width="760"  height="20" >
-                <g id="graph2_bars" >
-                </g>
-                <g id="graph2_labels">
-                </g>
-                <path id="graph2_path"></path>
+                <g id="graph2_bars" transform="translate(28, 0)" />
+                <g id="graph2_labels" transform="translate(28, 0)" />
+                <path id="graph2_path" transform="translate(28, 0)" />
+                <g id="graph2_axis_left" />
             </svg>
             <br/>
             <label for="x_day_avg">Number of Days to average</label>
@@ -93,12 +95,10 @@
         <div id="graph3_wrapper" >
             <h2> Word Use Difference</h2>
             <svg id="graph3" width="760" height="20">
-                <g id="graph3_bars" transform="translate(110, 30)" >
-                </g>
-                <g id="graph3_labels" transform="translate(110, 30)" >
-                </g>
-                <g id="graph3_annotations"  transform="translate(110, 30)" >
-                </g>
+                <g id="graph3_bars" transform="translate(60, 60)" />
+                <g id="graph3_labels" transform="translate(60, 60)" />
+                <g id="graph3_annotations"  transform="translate(20, 55)" />
+                <g id="graph3_axis_bottom" transform="translate(20, 60)" />
             </svg>
         </div>
 
@@ -110,6 +110,7 @@
 
     <script>
      var file_to_read;
+     var address_in = 171;
      var b_name = 'Bob';
      var b_ids = [23];
      var k_name = 'Kate';
@@ -124,6 +125,11 @@
              document.getElementById('show_button').disabled = true;
          }
      }
+
+     document.getElementById('address_input').oninput = function() {
+         address_in = parseInt(document.getElementById('thread_input').value, 10);
+         refresh_show();
+     };
 
      document.getElementById('k_ids_input').oninput = function() {
          k_ids = string_to_int_array(document.getElementById('k_ids_input').value);
