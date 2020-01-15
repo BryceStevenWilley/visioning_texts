@@ -31,18 +31,27 @@ function word_reduce(all_words, msg) {
 
 function total_to_from_data(data) {
     return data.names.map(function(n) {
-        name_filt = data.data.filter(function(row) {
+        let name_filt = data.data.filter(function(row) {
             return row.name == n;
+        });
+        let chars = name_filt.map(function(row) {
+            return row.BODY.length;
+        });
+        let words = name_filt.map(function(d) {
+            let tmp = word_split(d);
+            return tmp.split(' ').filter(function(str) {
+                return str.length != 0;
+            }).length;
         });
         return {
             'name' : n,
             'texts' : name_filt.length,
-            'chars' : name_filt.map(function(row) {
-                return row.BODY.length;
-            }).reduce(function(total, num) {
+            'chars' : chars,
+            'words' : words,
+            'char_sum' : chars.reduce(function(total, num) {
                 return total + num;
             }, 0),
-            'words' : name_filt.map(word_split).reduce(word_reduce, []).length
+            'word_sum' : name_filt.map(word_split).reduce(word_reduce, []).length
         };
     });
 }

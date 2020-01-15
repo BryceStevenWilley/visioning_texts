@@ -11,38 +11,31 @@ function string_to_int_array(input_str) {
     return int_array;
 }
 
-function set_graph_0(data) {
-    let totals_data = total_to_from_data(data);
-
+function set_graph_0_pie(totals_data, names) {
+    var pieGenerator = d3.pie()
+        .value(function(d) {return d.texts;});
     var maxBarWidth = 400;
     var barScale = d3.scaleLinear()
         .domain([0, Math.max(...totals_data.map(function (d) { return d.texts;}))])
         .range([0, maxBarWidth]);
 
-    var colors = ['#ffd90a', 'green'];
-
-    d3.select('#graph0')
-        .attr('height', 210);
-
-    var pieGenerator = d3.pie()
-        .value(function(d) {return d.texts;});
-
+    var colors = ['#66298c', 'green'];
     var arcGenerator = d3.arc()
         .innerRadius(20)
         .outerRadius(100);
 
     var arcData = pieGenerator(totals_data);
 
-    let u = d3.select('#graph0_bars').selectAll('path').data(arcData);
+    let u = d3.select('#graph0_pie_pie').selectAll('path').data(arcData);
     u.enter().append('path').merge(u)
         .attr('d', arcGenerator)
         .attr('stroke', 'white')
         .attr('fill', function(d, i) {
-            return colors[data.names.indexOf(d.data.name)];
+            return colors[names.indexOf(d.data.name)];
         });
     u.exit().remove();
 
-    let t = d3.select('#graph0_labels').selectAll('text').data(arcData);
+    let t = d3.select('#graph0_pie_labels').selectAll('text').data(arcData);
     t.enter().append('text').merge(t)
         .attr('fill', 'white')
         .attr('text-anchor', 'middle')
@@ -60,7 +53,7 @@ function set_graph_0(data) {
         .innerRadius(100)
         .outerRadius(150);
 
-    let t2 = d3.select('#graph0_annotations').selectAll('text').data(arcData);
+    let t2 = d3.select('#graph0_pie_annotations').selectAll('text').data(arcData);
     t2.enter().append('text').merge(t2)
         .attr('fill', 'white')
         .attr('text-anchor', 'middle')
@@ -73,21 +66,95 @@ function set_graph_0(data) {
                 .text(d.data.texts);
         });
     t2.exit().remove();
+}
 
-    let sums = totals_data.reduce(function(total, d) {
-        total.texts = +total.texts + d.texts;
-        total.words = +total.words + d.words;
-        total.chars = +total.chars + d.chars;
-        return total;
-    }, {'texts' : 0, 'words' : 0, 'chars' : 0});
+function set_graph_0_whisk(just_data, elem_id, color, description) {
+    // Stats
+    let min = Math.min(...just_data);
+    let max = Math.max(...just_data);
+    let data_sorted = just_data.sort(d3.ascending);
+    let q1 = d3.quantile(data_sorted, .25);
+    let median = d3.quantile(data_sorted, .5);
+    let q3 = d3.quantile(data_sorted, .75);
+    let interQuantileRange = q3 - q1;
+    let min_bar = Math.max(min, q1 - 1.5 * interQuantileRange);
+    let max_bar = Math.min(max, q3 + 1.5 * interQuantileRange);
+    let height = 32;
+    let mid = 0;
 
-    let x = d3.select('#graph0_avgs').selectAll('div').data([sums]);
-    x.enter().append('div').merge(x)
-        .text(function(d) {
-            return (d.words / d.texts).toFixed(3) + ' average words per text, ' +
-                (d.chars / d.texts).toFixed(3) + ' average characters per text';
-        });
-    x.exit().remove();
+    let xScale = d3.scaleLinear().domain([0, max]).range([0, 300]);
+
+    d3.select(elem_id + '_line')
+        .attr('y1', mid).attr('y2', mid)
+        .attr('x1', xScale(min_bar)).attr('x2', xScale(max_bar))
+        .attr('stroke', 'white');
+
+    d3.select(elem_id + '_box')
+        .attr('y', mid - height / 2)
+        .attr('x', xScale(q1))
+        .attr('height', height)
+        .attr('width', (xScale(q3) - xScale(q1)))
+        .attr('stroke', 'white')
+        .attr('fill', color);
+
+    let u = d3.select(elem_id + '_whisk').selectAll('line').data([min_bar, median, max_bar]);
+    u.enter().append('line').merge(u)
+        .attr('y1', mid - height / 2)
+        .attr('y2', mid + height / 2)
+        .attr('x1', function(d) { return xScale(d); })
+        .attr('x2', function(d) { return xScale(d); })
+        .attr('stroke', 'white');
+    u.exit().remove();
+
+    let outliers = just_data.filter(function(d) {
+        return d < min_bar || d > max_bar;
+    });
+    console.log(outliers);
+    let c = d3.select(elem_id + '_whisk').selectAll('circle').data([min, max]); //outliers);
+    c.enter().append('circle').merge(c)
+        .attr('cy', mid)
+        .attr('cx', function(d) { return xScale(d); })
+        .attr('r', 3)
+        .attr('fill', 'white');
+    c.exit().remove();
+
+    let t = d3.select(elem_id + '_labels').selectAll('text').data([min, min_bar, median, max_bar, max]);
+    t.enter().append('text').merge(t)
+        .attr('x', function(d) { return xScale(d); })
+        .attr('y', mid + height)
+        .attr('text-anchor', 'middle')
+        .attr('fill', 'white')
+        .text(function(d) { return d; });
+    t.exit().remove();
+
+    d3.select(elem_id + '_annotations').text(description)
+        .attr('y', mid - height)
+        .attr('alignment-baseline', 'baseline')
+        .attr('fill', 'white');
+
+}
+
+function set_graph_0(data) {
+    let totals_data = total_to_from_data(data);
+
+    d3.select('#graph0')
+        .attr('height', 450);
+
+    set_graph_0_pie(totals_data, data.names);
+
+    let just_words = totals_data.map(function(d) {
+        return d.words;
+    }).reduce(function(total, d) {
+        return total.concat(d);
+    }, []);
+    set_graph_0_whisk(just_words, '#graph0_word', 'green', 'Words per text');
+
+    let just_chars = totals_data.map(function(d) {
+        return d.chars;
+    }).reduce(function(total, d) {
+        return total.concat(d);
+    }, []);
+    set_graph_0_whisk(just_chars, '#graph0_char', 'green', 'Characters per text');
 }
 
 function set_graph_1(data, day) {
@@ -237,6 +304,10 @@ function set_graph_3(word_count_less, names) {
         item.list.sort(function(i1, i2) {
             return i1.total - i2.total;
         });
+        if (item.list.length > 40) {
+            item.list = item.list.slice(0, 40);
+            item.list.push('...');
+        }
     });
 
     let height = 1000;
@@ -428,7 +499,7 @@ function x_day_avg(x) {
 
     d3.select('#graph2_path')
         .attr('d', pathData)
-        .attr('stroke', 'white')
+        .attr('stroke', '#66298c')
         .attr('stroke-width', 2)
         .attr('fill', "none");
 }

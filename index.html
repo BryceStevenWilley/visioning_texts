@@ -13,7 +13,10 @@
 
     <body>
         <h1>Visoning Texts</h1>
-        <input type="file" id="file_select"  names="file[]"/>
+        <label for="file_select" class="custom-file-upload">
+            Choose a File
+        </label>
+        <input type="file" id="file_select"  names="file[]" class="flat_buttons" />
         <output id="list" ></output>
         <table id="input_table" class="hide">
             <tr>
@@ -45,16 +48,34 @@
         </table>
         <button type="button" id="show_button"
                 onclick="trigger_process(file_to_read)"
-                class="hide"
+                class="hide flat_buttons"
                 disabled>Show Data!</button>
 
         <div class="hide">
         <div id="graph0_wrapper">
             <h2 id="num_msgs">Total Number of Messages</h2>
             <svg id="graph0" width="760"  height="20" >
-                <g id="graph0_bars" transform="translate(150, 100)" />
-                <g id="graph0_labels" transform="translate(150, 100)" />
-                <g id="graph0_annotations"  transform="translate(150, 100)" />
+                <g id="graph0_pie" transform="translate(150, 100)">
+                    <g id="graph0_pie_pie" />
+                    <g id="graph0_pie_labels" />
+                    <g id="graph0_pie_annotations" />
+                </g>
+                <g id="graph0_word" transform="translate(50, 270)" >
+                    <line id="graph0_word_line"/>
+                    <g id="graph0_word_whisk">
+                        <rect id="graph0_word_box"/>
+                    </g>
+                    <g id="graph0_word_labels" />
+                    <text id="graph0_word_annotations" />
+                </g>
+                <g id="graph0_char" transform="translate(50, 380)" >
+                    <line id="graph0_char_line"/>
+                    <g id="graph0_char_whisk">
+                        <rect id="graph0_char_box"/>
+                    </g>
+                    <g id="graph0_char_labels" />
+                    <text id="graph0_char_annotations" />
+                </g>
             </svg>
             <div id="graph0_avgs">
             </div>
