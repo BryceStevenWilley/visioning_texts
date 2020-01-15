@@ -19,6 +19,39 @@ function split_b_k(data, b_ids, k_ids, b_name, k_name, address_id) {
     });
     return {'names' : [b_name, k_name], 'data' : full_data};
 }
+
+function split_b_k_whatsapp(text) {
+    let lines = text.split('\n').filter(function(d) { return d.length != 0; });
+    lines = lines.slice(1);
+    lines = lines.reduce(function(total, l) {
+        let dash_idx = l.indexOf('-');
+        let time_str = l.slice(0, dash_idx);
+        if (/(\d+)\/(\d+)\/(\d+)/.test(time_str.trim())) {
+            total.push(l);
+        } else {
+            total[total.length - 1] = total[total.length - 1].concat(l);
+        }
+        return total;
+    }, []);
+    let full_data = lines.map(function(l) {
+        let dash_idx = l.indexOf('-');
+        let time_str = l.slice(0, dash_idx);
+        let rest_str = l.slice(dash_idx + 1);
+        let colon_idx = rest_str.indexOf(':');
+        let name_str = rest_str.slice(0, colon_idx);
+        let msg_str = rest_str.slice(colon_idx + 1);
+        return {'name' : name_str.trim(), 'BODY' : msg_str.trim(),
+                'date' : new Date(time_str.trim())};
+    });
+    let names = full_data.reduce(function(total, d) {
+        total.add(d.name);
+        return total;
+    }, new Set());
+    var list_names = Array.from(names);
+
+    return {'names' : list_names, 'data': full_data};
+}
+
 function word_split(row) {
     return row.BODY.replace(/[.,!?\n]/g, '');
 }

@@ -22,7 +22,7 @@
         </label>
         <input type="file" id="file_select"  names="file[]" class="flat_buttons" />
         <output id="list" ></output>
-        <table id="input_table" class="hide">
+        <table id="signal_input_table" class="hide">
             <tr>
                 <td>Address: </td>
                 <td>
@@ -57,7 +57,7 @@
 
         <div class="hide">
         <section id="graph0_wrapper">
-            <h2 id="num_msgs">Total Number of Messages</h2>
+            <h2 id="num_msgs">Message Statistics Summary</h2>
             <svg id="graph0" width="760"  height="20" >
                 <g id="graph0_pie" transform="translate(150, 100)">
                     <g id="graph0_pie_pie" />
@@ -86,7 +86,7 @@
         </section>
 
         <div id="graph1_wrapper" >
-            <h2 id="num_msgs">Message count per hour</h2>
+            <h2 id="num_msgs">Message Count per hour</h2>
             <svg id="graph1" width="1300"  height="20">
                 <g id="graph1_bars" transform="translate(28, 0)" />
                 <g id="graph1_labels" transform="translate(28, 0)" />
@@ -105,7 +105,7 @@
         </div>
 
         <div id="graph2_wrapper" >
-            <h2> Message Count over the year</h2>
+            <h2> Message Count over time</h2>
             <svg id="graph2" width="760"  height="20" >
                 <g id="graph2_bars" transform="translate(28, 0)" />
                 <g id="graph2_labels" transform="translate(28, 0)" />
@@ -119,6 +119,8 @@
 
         <div id="graph3_wrapper" >
             <h2> Word Use Difference</h2>
+            <p> The closer to either extreme, the more likely words listed would used by that person.
+                Words near the center are equally likely to be used by either person.</p>
             <svg id="graph3" width="760" height="20">
                 <g id="graph3_bars" transform="translate(60, 60)" />
                 <g id="graph3_labels" transform="translate(60, 60)" />
@@ -129,6 +131,7 @@
 
         <section id="graph4_wrapper" >
             <h2> Top used Emoji's</h2>
+            <p> Mouseover each to see it's total use count. </p>
         </section>
         </div>
     </body>

@@ -109,7 +109,6 @@ function set_graph_0_whisk(just_data, elem_id, color, description) {
     let outliers = just_data.filter(function(d) {
         return d < min_bar || d > max_bar;
     });
-    console.log(outliers);
     let c = d3.select(elem_id + '_whisk').selectAll('circle').data([min, max]); //outliers);
     c.enter().append('circle').merge(c)
         .attr('cy', mid)
@@ -177,7 +176,11 @@ function set_graph_1(data, day) {
         .attr('width', filtered_times.length * bar_width + 28)
         .attr('height', maxBarHeight + 50);
 
+    var trans = d3.transition()
+        .duration(500);
+
     u.enter().append('rect').merge(u)
+        .transition(trans)
         .attr('width', bar_width - 1)
         .attr('height', function(d) {
             return barScale_height(d.texts) + 'px';
@@ -371,13 +374,13 @@ function set_graph_4(emoji_count) {
         .data(emoji_count);
     u.enter()
         .append('div')
-        .html(function(d) {
-            return '<h3>' + d.name + '\'s</h3>\n<svg id="graph4_' + d.name
+        .html(function(d, i) {
+            return '<h3>' + d.name + '\'s</h3>\n<svg id="graph4_' + i
                 + '" width="' + width + '" height="' + height + '"></svg>';
         });
     u.exit().remove();
 
-    emoji_count.forEach(function(n_c) {
+    emoji_count.forEach(function(n_c, i) {
         let emoji_count_b = n_c.emoji_count;
         var simulation = d3.forceSimulation(emoji_count_b)
             .force('charge', d3.forceManyBody().strength(5))
@@ -388,7 +391,8 @@ function set_graph_4(emoji_count) {
             .on('tick', ticked);
 
         function ticked() {
-            var u = d3.select('#graph4_' + n_c.name)
+            console.log(i);
+            var u = d3.select('#graph4_' + i)
                 .selectAll('g')
                 .data(emoji_count_b);
             u.enter()
@@ -398,7 +402,8 @@ function set_graph_4(emoji_count) {
                     let font_size = emoji_rad * 1.74;
                     let scoot_y = font_size / 2.78;
                     return '<text text-anchor="middle" y="' + scoot_y
-                        + '" font-size=\"' + font_size + '\">' + d[1] + '</text';
+                        + '" font-size=\"' + font_size + '\">' + d[1]
+                        + '<title>Use count: ' + d[0] + '</title></text>';
                 })
                 .merge(u)
                 .attr('transform', function(d) {
@@ -416,20 +421,27 @@ function handleFileSelect(evt) {
         // files is a FileList of File objects. List some properties.
         file_to_read = files[0];
         let f = file_to_read;
-        if (f.type != 'text/csv') {
-            alert('You need to upload a CSV file');
+        if (f.type != 'text/plain' && f.type != 'text/csv') {
+            alert("Can't read this type of file at the moment."
+                  + "Please try a Signal csv, or a WhatsApp text file");
             return;
         }
         let size_str = (f.size > 1000) ? (
             (f.size > 1000000) ? (f.size / 1000000).toFixed(2) + 'MB' : (f.size / 1000).toFixed(2) + 'kB')
             : f.size + 'bytes';
+        let disp_name = escape(f.name);
+        if (disp_name.length > 20) {
+            disp_name = disp_name.slice(0, 20) + "...";
+        }
         document.getElementById('list').innerHTML = '<ul>' +
-            '<li><strong>' + escape(f.name) + '</strong> (' +  (f.type || 'n/a') + '),' +
+            '<li><strong>' + disp_name + '</strong> (' +  (f.type || 'n/a') + '),' +
             size_str + ', last modified: ' +
             (f.lastModifiedDate ?
              f.lastModifiedDate.toLocaleDateString() : 'n/a') +
             '</li></ul>';
-        d3.select('#input_table').classed('hide', false);
+        if (f.type == 'text/csv') {
+            d3.select('#signal_input_table').classed('hide', false);
+        }
         d3.select('button').classed('hide', false);
     } else {
         alert('The File APIs are not fully supported in this browser.');
@@ -448,8 +460,13 @@ function trigger_process(f) {
             let k_name = document.getElementById("k_name_input").value;
             let b_ids = string_to_int_array(document.getElementById('b_ids_input').value);
             let k_ids = string_to_int_array(document.getElementById('k_ids_input').value);
-            csv_obj = d3.csvParse(e.target.result);
-            let data = split_b_k(csv_obj, b_ids, k_ids, b_name, k_name, address_id);
+            var data;
+            if (f.type == 'text/csv') {
+                let csv_obj = d3.csvParse(e.target.result);
+                data = split_b_k(csv_obj, b_ids, k_ids, b_name, k_name, address_id);
+            } else if (f.type == 'text/plain') {
+                data = split_b_k_whatsapp(e.target.result);
+            }
             set_graph_0(data);
             setTimeout(function() {
                 time_of_days = xy_time_of_day(data);
@@ -481,6 +498,9 @@ function x_day_avg(x) {
     let full_width = Math.min(days_in_year.length * 3, screen.width - 50);
     let width = full_width / days_in_year.length;
 
+    var trans = d3.transition()
+        .duration(500);
+
     let lineGenerator = d3.line()
         .x(function(d, i) {
             return i * width;
@@ -498,6 +518,7 @@ function x_day_avg(x) {
     var pathData = lineGenerator(days_in_year);
 
     d3.select('#graph2_path')
+        .transition(trans)
         .attr('d', pathData)
         .attr('stroke', '#66298c')
         .attr('stroke-width', 2)
