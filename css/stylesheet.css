@@ -18,6 +18,17 @@ h1,h2,h3,h4 {
     color : #ffd90a;
 }
 
+a {
+    text-decoration: underline;
+    color: #ffffff;
+}
+
+.page_title {
+    margin: auto;
+    width: 50%;
+    padding: 20px;
+}
+
 .hide {
     display: none;
 }

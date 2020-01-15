@@ -12,7 +12,11 @@
     <style></style>
 
     <body>
-        <h1>Visoning Texts</h1>
+        <header class="page_title" >
+            <h1>Visoning Texts</h1>
+            <h3>Made by <a href="https://brycewilley.xyz">Bryce Willey</a></h3>
+        </header>
+        <br/>
         <label for="file_select" class="custom-file-upload">
             Choose a File
         </label>
@@ -52,7 +56,7 @@
                 disabled>Show Data!</button>
 
         <div class="hide">
-        <div id="graph0_wrapper">
+        <section id="graph0_wrapper">
             <h2 id="num_msgs">Total Number of Messages</h2>
             <svg id="graph0" width="760"  height="20" >
                 <g id="graph0_pie" transform="translate(150, 100)">
@@ -79,7 +83,7 @@
             </svg>
             <div id="graph0_avgs">
             </div>
-        </div>
+        </section>
 
         <div id="graph1_wrapper" >
             <h2 id="num_msgs">Message count per hour</h2>
