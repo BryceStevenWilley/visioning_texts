@@ -399,6 +399,7 @@ function set_graph_4(emoji_count) {
                 .data(emoji_count_b);
             u.enter()
                 .append('g')
+                .merge(u)
                 .html(function(d) {
                     let emoji_rad = Math.sqrt(emoji_scale * d[0]) / Math.PI;
                     let font_size = emoji_rad * 1.74;
@@ -407,7 +408,6 @@ function set_graph_4(emoji_count) {
                         + '" font-size=\"' + font_size + '\">' + d[1]
                         + '<title>Use count: ' + d[0] + '</title></text>';
                 })
-                .merge(u)
                 .attr('transform', function(d) {
                     return 'translate(' + d.x + ',' + d.y + ')';
                 });
