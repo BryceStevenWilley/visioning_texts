@@ -230,7 +230,7 @@ function set_graph_2(data) {
     let width = full_width / days_in_year.length;
 
     d3.select('#graph2')
-        .attr('width', full_width + 50)
+        .attr('width', full_width + 100)
         .attr('height', maxBarLength + 50);
 
     let u = d3.select('#graph2_bars')
@@ -309,7 +309,7 @@ function set_graph_3(word_count_less, names) {
         });
         if (item.list.length > 40) {
             item.list = item.list.slice(0, 40);
-            item.list.push('...');
+            item.list.push({'word' : '...', 'total' : 1});
         }
         maxLength = Math.max(maxLength, item.list.length);
     });
