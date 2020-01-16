@@ -80,11 +80,7 @@ function total_to_from_data(data) {
             'name' : n,
             'texts' : name_filt.length,
             'chars' : chars,
-            'words' : words,
-            'char_sum' : chars.reduce(function(total, num) {
-                return total + num;
-            }, 0),
-            'word_sum' : name_filt.map(word_split).reduce(word_reduce, []).length
+            'words' : words
         };
     });
 }
@@ -274,7 +270,7 @@ function emoji_filter(word_count_map) {
     return word_count_map.map(function(x) {
         let tmp_map = {}, key_word;
         for (key_word in x.word_count) {
-            if (x.word_count.hasOwnProperty(key_word)) {
+            if (x.word_count.hasOwnProperty(key_word) && emoji_rgx.test(key_word)) {
                 let graphemes = splitter.iterateGraphemes(key_word);
                 let result = graphemes.next();
                 while (!result.done) {

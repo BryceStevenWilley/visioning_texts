@@ -393,21 +393,32 @@ function set_graph_4(emoji_count) {
             }))
             .on('tick', ticked);
 
+        let u = d3.select('#graph4_' + i)
+            .selectAll('g')
+            .data(emoji_count_b);
+        u.enter()
+            .append('g')
+            .merge(u)
+            .html(function(d) {
+                let emoji_rad = Math.sqrt(emoji_scale * d[0]) / Math.PI;
+                let font_size = emoji_rad * 1.74;
+                let scoot_y = font_size / 2.78;
+                return '<text text-anchor="middle" y="' + scoot_y
+                    + '" font-size=\"' + font_size + '\">' + d[1]
+                    + '<title>Use count: ' + d[0] + '</title></text>';
+            })
+            .attr('transform', function(d) {
+                return 'translate(' + d.x + ',' + d.y + ')';
+            });
+        u.exit().remove();
+
         function ticked() {
-            var u = d3.select('#graph4_' + i)
+            let u2 = d3.select('#graph4_' + i)
                 .selectAll('g')
                 .data(emoji_count_b);
-            u.enter()
+            u2.enter()
                 .append('g')
-                .merge(u)
-                .html(function(d) {
-                    let emoji_rad = Math.sqrt(emoji_scale * d[0]) / Math.PI;
-                    let font_size = emoji_rad * 1.74;
-                    let scoot_y = font_size / 2.78;
-                    return '<text text-anchor="middle" y="' + scoot_y
-                        + '" font-size=\"' + font_size + '\">' + d[1]
-                        + '<title>Use count: ' + d[0] + '</title></text>';
-                })
+                .merge(u2)
                 .attr('transform', function(d) {
                     return 'translate(' + d.x + ',' + d.y + ')';
                 });
