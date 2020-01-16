@@ -270,7 +270,7 @@ function emoji_filter(word_count_map) {
     return word_count_map.map(function(x) {
         let tmp_map = {}, key_word;
         for (key_word in x.word_count) {
-            if (x.word_count.hasOwnProperty(key_word) && emoji_rgx.test(key_word)) {
+            if (x.word_count.hasOwnProperty(key_word) && key_word.match(emoji_rgx)) {
                 let graphemes = splitter.iterateGraphemes(key_word);
                 let result = graphemes.next();
                 while (!result.done) {
