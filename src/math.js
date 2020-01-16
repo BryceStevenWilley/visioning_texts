@@ -40,7 +40,7 @@ function split_b_k_whatsapp(text) {
         let colon_idx = rest_str.indexOf(':');
         let name_str = rest_str.slice(0, colon_idx);
         let msg_str = rest_str.slice(colon_idx + 1);
-        return {'name' : name_str.trim(), 'BODY' : msg_str.trim(),
+        return {'name' : name_str.trim().split(' ')[0], 'BODY' : msg_str.trim(),
                 'date' : new Date(time_str.trim())};
     });
     let names = full_data.reduce(function(total, d) {

@@ -299,10 +299,10 @@ function set_graph_3(word_count_less, names) {
         } else {
             total[total.length - 1].list.push(to_add);
         }
-
         return total;
     }, start_empty);
 
+    let maxLength = 0;
     chunk.forEach(function(item) {
         item.list.sort(function(i1, i2) {
             return i1.total - i2.total;
@@ -311,6 +311,7 @@ function set_graph_3(word_count_less, names) {
             item.list = item.list.slice(0, 40);
             item.list.push('...');
         }
+        maxLength = Math.max(maxLength, item.list.length);
     });
 
     let height = 1000;
@@ -320,10 +321,6 @@ function set_graph_3(word_count_less, names) {
     var maxWordTotal = Math.max(...word_count_even_less.map(function(w) {return w[1];}));
     var totalScale = d3.scaleLinear().domain([0, maxWordTotal]).range([height, 0]);
     var colorScale = d3.scaleLinear().domain([-1, 1]).range(['#ffd90a', 'white']);
-
-    d3.select('#graph3')
-        .attr('height', height + 40)
-        .attr('width', width + 40);
 
     let t = d3.select('#graph3_labels')
         .selectAll('text')
@@ -359,14 +356,15 @@ function set_graph_3(word_count_less, names) {
             return d;
         });
 
+    d3.select('#graph3')
+        .attr('height', Math.min((height + 40) * 4 / 3, 60 * .75 + 1.4 * 12 * maxLength) + 'pt')
+        .attr('width', width + 80);
+
     d3.select('#graph3_axis_bottom')
         .call(d3.axisBottom().scale(diffScale));
 }
 
 function set_graph_4(emoji_count) {
-    var width = 500;
-    var height = 500;
-
     let emoji_scale = 900;
 
     let u = d3.select('#graph4_wrapper')
@@ -375,13 +373,18 @@ function set_graph_4(emoji_count) {
     u.enter()
         .append('div')
         .html(function(d, i) {
-            return '<h3>' + d.name + '\'s</h3>\n<svg id="graph4_' + i
-                + '" width="' + width + '" height="' + height + '"></svg>';
+            return '<h3>' + d.name + '\'s</h3>\n<svg id="graph4_' + i + '"></svg>';
         });
     u.exit().remove();
 
     emoji_count.forEach(function(n_c, i) {
         let emoji_count_b = n_c.emoji_count;
+        let width = 50 * Math.sqrt(emoji_count_b.length);
+        let height = 50 * Math.sqrt(emoji_count_b.length);
+        d3.select('#graph4_' + i)
+            .attr('width', width)
+            .attr('height', height);
+
         var simulation = d3.forceSimulation(emoji_count_b)
             .force('charge', d3.forceManyBody().strength(5))
             .force('center', d3.forceCenter(width / 2, height / 2))
@@ -391,7 +394,6 @@ function set_graph_4(emoji_count) {
             .on('tick', ticked);
 
         function ticked() {
-            console.log(i);
             var u = d3.select('#graph4_' + i)
                 .selectAll('g')
                 .data(emoji_count_b);

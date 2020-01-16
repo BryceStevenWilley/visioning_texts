@@ -1,15 +1,13 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>Signal Messages, Visualized</title>
-        <script type="text/javascript" src="lib/grapheme.js"></script>
+        <title>Visioning Messages</title>
+        <script type="text/javascript" src="lib/grapheme-splitter.js"></script>
         <script type="text/javascript" src="lib/d3.min.js"></script>
         <script type="text/javascript" src="src/math.js"></script>
         <script type="text/javascript" src="src/graphs.js"></script>
         <link rel="stylesheet"  href="css/stylesheet.css" typet="text/css" charset="utf-8"/>
     </head>
-
-    <style></style>
 
     <body>
         <header class="page_title" >
@@ -18,7 +16,7 @@
         </header>
         <br/>
         <label for="file_select" class="custom-file-upload">
-            Choose a File
+            Choose your Messages File
         </label>
         <input type="file" id="file_select"  names="file[]" class="flat_buttons" />
         <output id="list" ></output>
@@ -121,11 +119,11 @@
             <h2> Word Use Difference</h2>
             <p> The closer to either extreme, the more likely words listed would used by that person.
                 Words near the center are equally likely to be used by either person.</p>
-            <svg id="graph3" width="760" height="20">
-                <g id="graph3_bars" transform="translate(60, 60)" />
-                <g id="graph3_labels" transform="translate(60, 60)" />
-                <g id="graph3_annotations"  transform="translate(20, 55)" />
-                <g id="graph3_axis_bottom" transform="translate(20, 60)" />
+            <svg id="graph3">
+                <g id="graph3_bars" transform="translate(100, 60)" />
+                <g id="graph3_labels" transform="translate(100, 60)" />
+                <g id="graph3_annotations"  transform="translate(60, 55)" />
+                <g id="graph3_axis_bottom" transform="translate(60, 60)" />
             </svg>
         </div>
 
