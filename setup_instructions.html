@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Visioning Texts, Instructions</title>
+        <link rel="stylesheet"  href="css/stylesheet.css" typet="text/css" charset="utf-8"/>
+    </head>
+
+    <body>
+        <header class="page_title" >
+            <h1>Visioning Your Own Data: Instructions</h1>
+            <h3>Head back to the <a href="index.html">Main Viz</a></h3>
+        </header>
+
+        <section>
+            <article>
+                <h2>Whatsapp</h2>
+
+            </article>
+        </section>
+
+        <section>
+            <article>
+                <h2>Signal</h2>
+                <p>This one is a bit complicated, but we'll go through step-by-step.
+                    You'll need access to your Signal app (obiviously) and a computer.
+                </p>
+                <ol>
+                    <li><h4>Create a Signal Backup</h4>
+                        <p> In the app, press the menu button and go to Settings.
+                            When in settings, press "Chats and Media".
+                            <br/>
+                            <img src="doc/images/settings_menu.png" alt="the Signal menu screen" height="500" />
+                            <br/>
+                            Scroll to the bottom of the page and turn on "Chat Backups".
+                            <br/>
+                            <img src="doc/images/chat_backup.png" alt="the Signal Chats and Media screen, emphasizing the Chat Backup selection" height="500" />
+                            <br/>
+                            This will start  the backup process, which takes several minutes.
+                            <em>Be sure to save the passphrase shown when you first turn on backups.
+                            </em>
+                        </p>
+                    </li>
+                    <li><h4>Download the Backup</h4>
+                        <p>On Android, you can go to the "Files" app.
+                            The backup file will be in the main phone memory, in the Signal folder.
+                            <img/>
+                            Once there, download the file to your computer.
+                            I usually use Google Drive for this, but pick your poison.
+                        </p>
+                    </li>
+                    <li><h4>Decrpyt the Backups</h4>
+                        <p>The best option for this as of early 2020 is https://github.com/xeals/signal-back.
+                            Go to https://github.com/xeals/signal-back/releases/tag/v0.1.7-alpha.2, and download the compiled binary for your system.
+                            MacOS will be "Darwin", and Linux and Windows are named normally.
+                            Once downloaded, open a terminal window, and run the following command:
+                            <code>./signal-back_linux_amd64 format -f CSV -o backup.csv signal-YYYY.backup</code>
+                            replacing "signal-YYYY.backup" with the name of your Signal backup download.
+
+                            <aside>You might need to make signal-back executable. On Linux, this command is <code>chmod +x signal-back_linux_amd64</code></aside>
+
+                            This will generate the CSV file that you'll give to the visualizer on the <a href="index.html">main page</a>.
+                        </p>
+                    </li>
+                    <li><h4>Find the Address and the IDs</h4>
+                        <p> When you upload the CSV file to the visualizer, you'll be asked for an "Address", and the names and IDs of the conversation participants.
+                            The names are just to label the data for you to understand better, and aren't used anywhere else.
+                            The address is the Signal CSV's term for "conversation".
+                            IDs are numbers that uniquely identify participants in the conversation.
+                            If you open the CSV file in a spreadsheet app (Excel, for example), you can look around for some conversations that you want to visualize (the message contents will be in the BODY column).
+                            Most conversations will only have 1 ID per participant, but if you switched from text to Signal, or had to regenerate your Signal key, then there might be multiple.
+                            You can enter as many IDs as necessary, comma separated, in the input.
+                        </p>
+                </ol>
+            </article>
+        </section>
