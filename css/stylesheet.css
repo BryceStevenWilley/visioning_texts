@@ -29,6 +29,10 @@ a {
     padding: 20px;
 }
 
+c-footer p{line-height:1;font-size:1.6rem}.c-footer a:not(:first-of-type){margin-left:2rem}.c-footer__container{display:-webkit-box;display:-webkit-flex;display:-ms-flexbox;-webkit-flex-wrap:wrap;-ms-flex-wrap:wrap;flex-wrap:wrap;display:flex;-webkit-box-pack:justify;-webkit-justify-content:space-between;-ms-flex-pack:justify;justify-content:space-between}
+
+.c-footer__container a{color:#ffd90a}
+
 .hide {
     display: none;
 }
