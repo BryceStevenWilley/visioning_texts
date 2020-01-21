@@ -54,7 +54,7 @@ function split_b_k_whatsapp(text) {
         else if(match_outlier && !match_mm_dd && !match_international && !match_brace)
         {
             return {
-                'regex':outline,
+                'regex':outlier,
                 'delim': ']',
                 'formats':[
                     
