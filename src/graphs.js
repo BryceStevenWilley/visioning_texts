@@ -266,7 +266,12 @@ function set_graph_2(data) {
         })
         .attr('y', maxBarLength + 25)
         .text(function(d) {
-            let options = {month: 'long'};
+            var options;
+            if (days_in_year.length > 365) {
+                options = {month: 'short', year: '2-digit'};
+            } else {
+                options = {month: 'long'};
+            }
             return (d.date.getDate() == 1) ?
                 d.date.toLocaleDateString('en-US', options) : '';
         })
