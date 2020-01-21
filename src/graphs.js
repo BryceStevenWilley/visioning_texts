@@ -443,7 +443,7 @@ function handleFileSelect(evt) {
             f.type != 'application/vnd.ms-excel') { // Excel does weird shit sometimes
                 // https://stackoverflow.com/a/28233618/11416267
             alert("Can't read this type of file (" + f.type + ") at the moment."
-                  + " Please try a Signal csv, or a WhatsApp text file");
+                  + " Please try a Signal csv, a WhatsApp text file, or a Facebook json file.");
             return;
         }
         let size_str = (f.size > 1000) ? (
