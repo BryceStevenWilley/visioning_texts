@@ -24,7 +24,7 @@ var my_regex = /(\d+)\/(\d+)\/(\d+)/;
 var mm_dd_regex = /^(((0)?[0-9])|((1)[0-2]))(\/)([0-2][0-9]|(3)[0-1])(\/)(\d{2}|\d{4}), ([0-9][0-9]):([0-9][0-9]) -/;
 var international_regex = /^([0-2][0-9]|(3)[0-1])(\/)(((0)[0-9])|((1)[0-2]))(\/)(\d{2}|\d{4}), ([0-9][0-9]):([0-9][0-9]) -/;
 var brace_regex = /^\[([0-2][0-9]|(3)[0-1])(\.)(((0)[0-9])|((1)[0-2]))(\.)(\d{2}|\d{4}), ([0-9][0-9]):([0-9][0-9]):([0-9][0-9])?\]/;
-
+var outlier=/^\[([\d]{2}|[\d])\/([\d]{2}|[\d])\/([\d]{2}),\s([\d]{2}|[\d]{1}):([\d]{2}):([\d]{2}\s)(\w{2}\]\s)([\s\S]+):(\s[\s\S]+)/
 function split_b_k_whatsapp(text) {
     let lines = text.split('\n').filter(function(d) { return d.length != 0; });
     var used_regex;
@@ -37,6 +37,7 @@ function split_b_k_whatsapp(text) {
         let match_mm_dd = mm_dd_regex.test(l);
         let match_international = international_regex.test(l);
         let match_brace = brace_regex.test(l);
+        let match_outlier=outlier.test(l);
         if (match_mm_dd && !match_international && !match_brace) {
             return {'regex' :mm_dd_regex,
                     'delim' : '-',
@@ -49,7 +50,18 @@ function split_b_k_whatsapp(text) {
             return {'regex' : brace_regex,
                     'delim' : ']',
                     'formats' : ['[DD.MM.YY, HH:mm:ss', '[DD.MM.YYYY, HH:mm:ss']};
-        } else {
+        }
+        else if(match_outlier && !match_mm_dd && !match_international && !match_brace)
+        {
+            return {
+                'regex':outline,
+                'delim': ']',
+                'formats':[
+                    
+                    'M/D/YY, ' + time_s_a,          
+                ]}
+            }
+        else {
             // ambiguity: still empty
             return {};
         }
