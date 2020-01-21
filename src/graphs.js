@@ -267,7 +267,7 @@ function set_graph_2(data) {
         .attr('y', maxBarLength + 25)
         .text(function(d) {
             let options = {month: 'long'};
-            return (d.date.getDate() == 1 || d.day_count == 0) ?
+            return (d.date.getDate() == 1) ?
                 d.date.toLocaleDateString('en-US', options) : '';
         })
         .attr('text-anchor', 'start');
