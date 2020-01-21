@@ -30,28 +30,39 @@ function split_b_k_whatsapp(text) {
     var used_regex;
     var used_delim;
     var used_formats;
-    if (mm_dd_regex.test(lines[0])) {
-        used_regex = mm_dd_regex;
-        used_delim = '-';
-        used_formats = ['MM/DD/YY, HH:mm:ss', 'MM/DD/YYYY, HH:mm:ss'];
-    } else if (international_regex.test(lines[0])) {
-        used_regex = international_regex;
-        used_delim = '-';
-        used_format = ['DD/MM/YY, HH:mm:ss', 'DD/MM/YYYY, HH:mm:ss'];
-    } else if (brace_regex.test(lines[0])) {
-        used_regex = brace_regex;
-        used_delim = ']';
-        used_formats = ['[DD.MM.YY, HH:mm:ss'];
-    } else {
-        console.log("Doesn't match any known regex! " + lines[0]);
-        return [];
+    let used = lines.reduce(function(used_st, l) {
+        if (used_st['regex']) {
+            return used_st;
+        }
+        let match_mm_dd = mm_dd_regex.test(l);
+        let match_international = international_regex.test(l);
+        let match_brace = brace_regex.test(l);
+        if (match_mm_dd && !match_international && !match_brace) {
+            return {'regex' :mm_dd_regex,
+                    'delim' : '-',
+                    'formats' : ['MM/DD/YY, HH:mm:ss', 'MM/DD/YYYY, HH:mm:ss']};
+        } else if (match_international && !match_mm_dd && !match_brace) {
+            return {'regex' :international_regex,
+                    'delim' : '-',
+                    'formats' : ['DD/MM/YY, HH:mm:ss', 'DD/MM/YYYY, HH:mm:ss']};
+        } else if (match_brace && !match_mm_dd && !match_international) {
+            return {'regex' : brace_regex,
+                    'delim' : ']',
+                    'formats' : ['[DD.MM.YY, HH:mm:ss', '[DD.MM.YYYY, HH:mm:ss']};
+        } else {
+            // ambiguity: still empty
+            return {};
+        }
+    }, {});
+    if (!used['regex']) {
+        console.log("The input file has an ambigious date format. TODO(brycew): fix");
     }
 
     lines = lines.slice(1);
     lines = lines.reduce(function(total, l) {
-        let delim_idx = l.indexOf(used_delim);
+        let delim_idx = l.indexOf(used.delim);
         let time_str = l.slice(0, delim_idx);
-        if (l.match(used_regex)) {
+        if (l.match(used.regex)) {
             total.push(l);
         } else {
             total[total.length - 1] = total[total.length - 1].concat(l);
@@ -59,14 +70,14 @@ function split_b_k_whatsapp(text) {
         return total;
     }, []);
     let full_data = lines.map(function(l) {
-        let delim_idx = l.indexOf(used_delim);
+        let delim_idx = l.indexOf(used.delim);
         let time_str = l.slice(0, delim_idx);
         let rest_str = l.slice(delim_idx + 1);
         let colon_idx = rest_str.indexOf(':');
         let name_str = rest_str.slice(0, colon_idx);
         let msg_str = rest_str.slice(colon_idx + 1);
         return {'name' : name_str.trim().split(' ')[0], 'BODY' : msg_str.trim(),
-                'date' : moment(time_str.trim(), used_formats).toDate()};
+                'date' : moment(time_str.trim(), used.formats).toDate()};
     });
     let names = full_data.reduce(function(total, d) {
         total.add(d.name);
