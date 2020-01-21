@@ -21,15 +21,19 @@ function split_b_k(data, b_ids, k_ids, b_name, k_name, address_id) {
 }
 
 var my_regex = /(\d+)\/(\d+)\/(\d+)/;
-var mm_dd_regex = /^(((0)?[0-9])|((1)[0-2]))(\/)([0-2][0-9]|(3)[0-1])(\/)(\d{2}|\d{4}), ([0-9][0-9]):([0-9][0-9]) -/;
-var international_regex = /^([0-2][0-9]|(3)[0-1])(\/)(((0)[0-9])|((1)[0-2]))(\/)(\d{2}|\d{4}), ([0-9][0-9]):([0-9][0-9]) -/;
-var brace_regex = /^\[([0-2][0-9]|(3)[0-1])(\.)(((0)[0-9])|((1)[0-2]))(\.)(\d{2}|\d{4}), ([0-9][0-9]):([0-9][0-9]):([0-9][0-9])?\]/;
-var outlier=/^\[([\d]{2}|[\d])\/([\d]{2}|[\d])\/([\d]{2}),\s([\d]{2}|[\d]{1}):([\d]{2}):([\d]{2}\s)(\w{2}\]\s)([\s\S]+):(\s[\s\S]+)/
+var mm_dd_regex = /^(((0)?[0-9])|((1)[0-2]))([\.\/])([1-9]|[0-2][0-9]|3[0-1])([\.\/])(\d{2}|\d{4}), ([0-9]?[0-9]):([0-9][0-9])(:[0-9][0-9])?( [aApP][mM])? -/;
+var international_regex = /^([1-9]|[0-2][0-9]|3[0-1])([\.\/])(((0)?[0-9])|((1)[0-2]))([\.\/])(\d{2}|\d{4}), ([0-9]?[0-9]):([0-9][0-9])(:[0-9][0-9])?( [aApP][mM])? -/;
+var brace_regex = /^\[([1-9]|[0-2][0-9]|(3)[0-1])([\.\/])(((0)?[0-9])|((1)[0-2]))([\.\/])(\d{2}|\d{4}), (([0-9])?[0-9]):([0-9][0-9])(:[0-9][0-9])?( [aApP][mM])?\]/;
+
 function split_b_k_whatsapp(text) {
     let lines = text.split('\n').filter(function(d) { return d.length != 0; });
     var used_regex;
     var used_delim;
     var used_formats;
+    let time_s_a = 'HH:mm:ss a';
+    let time_m = 'HH:mm a';
+    let time_s = 'HH:mm:ss';
+    let time_ = 'HH:mm';
     let used = lines.reduce(function(used_st, l) {
         if (used_st['regex']) {
             return used_st;
@@ -37,37 +41,62 @@ function split_b_k_whatsapp(text) {
         let match_mm_dd = mm_dd_regex.test(l);
         let match_international = international_regex.test(l);
         let match_brace = brace_regex.test(l);
-        let match_outlier=outlier.test(l);
+        // TODO(brycew): this is awful. Find a better way to support locales?
         if (match_mm_dd && !match_international && !match_brace) {
             return {'regex' :mm_dd_regex,
                     'delim' : '-',
-                    'formats' : ['MM/DD/YY, HH:mm:ss', 'MM/DD/YYYY, HH:mm:ss']};
+                    'formats' : [
+                        'M/D/YY, ' + time_,
+                        'M/D/YY, ' + time_m,
+                        'M/D/YY, ' + time_s,
+                        'M/D/YY, ' + time_s_a,
+                        'M/D/YYYY, ' + time_,
+                        'M/D/YYYY, ' + time_m,
+                        'M/D/YYYY, ' + time_s,
+                        'M/D/YYYY, ' + time_s_a,
+                                ]};
         } else if (match_international && !match_mm_dd && !match_brace) {
             return {'regex' :international_regex,
                     'delim' : '-',
-                    'formats' : ['DD/MM/YY, HH:mm:ss', 'DD/MM/YYYY, HH:mm:ss']};
+                    'formats' : [
+                        'D/M/YY, ' + time_,
+                        'D/M/YY, ' + time_m,
+                        'D/M/YY, ' + time_s,
+                        'D/M/YY, ' + time_s_a,
+                        'D/M/YYYY, ' + time_,
+                        'D/M/YYYY, ' + time_m,
+                        'D/M/YYYY, ' + time_s,
+                        'D/M/YYYY, ' + time_s_a,
+                    ]};
         } else if (match_brace && !match_mm_dd && !match_international) {
             return {'regex' : brace_regex,
                     'delim' : ']',
-                    'formats' : ['[DD.MM.YY, HH:mm:ss', '[DD.MM.YYYY, HH:mm:ss']};
-        }
-        else if(match_outlier && !match_mm_dd && !match_international && !match_brace)
-        {
-            return {
-                'regex':outlier,
-                'delim': ']',
-                'formats':[
-                    
-                    'M/D/YY, HH:mm:ss a',          
-                ]}
-            }
-        else {
+                    'formats' : [
+                        '[D.M.YY, ' + time_,
+                        '[D.M.YY, ' + time_m,
+                        '[D.M.YY, ' + time_s,
+                        '[D.M.YY, ' + time_s_a,
+                        '[D.M.YYYY, ' + time_,
+                        '[D.M.YYYY, ' + time_m,
+                        '[D.M.YYYY, ' + time_s,
+                        '[D.M.YYYY, ' + time_s_a,
+                        '[D/M/YY, ' + time_,
+                        '[D/M/YY, ' + time_m,
+                        '[D/M/YY, ' + time_s,
+                        '[D/M/YY, ' + time_s_a,
+                        '[D/M/YYYY, ' + time_,
+                        '[D/M/YYYY, ' + time_m,
+                        '[D/M/YYYY, ' + time_s,
+                        '[D/M/YYYY, ' + time_s_a,
+                    ]};
+        } else {
             // ambiguity: still empty
             return {};
         }
     }, {});
     if (!used['regex']) {
         console.log("The input file has an ambigious date format. TODO(brycew): fix");
+        console.log("Example line: " + lines[0]);
     }
 
     lines = lines.slice(1);
