@@ -38,7 +38,6 @@ function split_b_k_facebook(text) {
             'BODY': msg.content
         };
     });
-    // debugger;
     return {
         'names': names,
         'data': data
