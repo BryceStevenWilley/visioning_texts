@@ -25,6 +25,26 @@ var mm_dd_regex = /^(((0)?[0-9])|((1)[0-2]))([\.\/])([1-9]|[0-2][0-9]|3[0-1])([\
 var international_regex = /^([1-9]|[0-2][0-9]|3[0-1])([\.\/])(((0)?[0-9])|((1)[0-2]))([\.\/])(\d{2}|\d{4}), ([0-9]?[0-9]):([0-9][0-9])(:[0-9][0-9])?( [aApP][mM])? -/;
 var brace_regex = /^\[([1-9]|[0-2][0-9]|(3)[0-1])([\.\/])(((0)?[0-9])|((1)[0-2]))([\.\/])(\d{2}|\d{4}), (([0-9])?[0-9]):([0-9][0-9])(:[0-9][0-9])?( [aApP][mM])?\]/;
 
+function split_b_k_facebook(text) {
+    const json = JSON.parse(text);
+    const names = json.participants.map((p) => p.name);
+    const data = json.messages.filter((msg) => {
+        return msg.type == "Generic"
+    }).map( (msg) => {
+        return {
+            'name': msg.sender_name,
+            'date': new Date(msg.timestamp_ms),
+            'ID': `${msg.sender_name}_${msg.timestamp_ms}`,
+            'BODY': msg.content
+        };
+    });
+    // debugger;
+    return {
+        'names': names,
+        'data': data
+    };
+}
+
 function split_b_k_whatsapp(text) {
     let lines = text.split('\n').filter(function(d) { return d.length != 0; });
     var used_regex;
