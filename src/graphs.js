@@ -434,8 +434,10 @@ function handleFileSelect(evt) {
         // files is a FileList of File objects. List some properties.
         file_to_read = files[0];
         let f = file_to_read;
-        if (f.type != 'text/plain' && f.type != 'text/csv') {
-            alert("Can't read this type of file at the moment."
+        if (f.type != 'text/plain' && f.type != 'text/csv' &&
+            f.type != 'application/vnd.ms-excel') { // Excel does weird shit sometimes
+                // https://stackoverflow.com/a/28233618/11416267
+            alert("Can't read this type of file (" + f.type + ") at the moment."
                   + "Please try a Signal csv, or a WhatsApp text file");
             return;
         }
