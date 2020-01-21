@@ -58,7 +58,7 @@ function split_b_k_whatsapp(text) {
                 'delim': ']',
                 'formats':[
                     
-                    'M/D/YY, ' + time_s_a,          
+                    'M/D/YY, HH:mm:ss a',          
                 ]}
             }
         else {
