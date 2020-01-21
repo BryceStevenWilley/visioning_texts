@@ -29,7 +29,7 @@ function split_b_k_facebook(text) {
     const json = JSON.parse(text);
     const names = json.participants.map((p) => p.name);
     const data = json.messages.filter((msg) => {
-        return msg.type == "Generic"
+        return msg.type == "Generic" && msg.content
     }).map( (msg) => {
         return {
             'name': msg.sender_name,
