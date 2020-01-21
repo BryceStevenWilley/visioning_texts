@@ -82,7 +82,7 @@ function set_graph_0_whisk(just_data, elem_id, color, description) {
     let height = 32;
     let mid = 0;
 
-    let xScale = d3.scaleLinear().domain([0, max]).range([0, 300]);
+    let xScale = d3.scaleLinear().domain([0, max]).range([0, 800]);
 
     d3.select(elem_id + '_line')
         .attr('y1', mid).attr('y2', mid)
@@ -130,14 +130,14 @@ function set_graph_0_whisk(just_data, elem_id, color, description) {
         .attr('y', mid - height)
         .attr('alignment-baseline', 'baseline')
         .attr('fill', 'white');
-
 }
 
 function set_graph_0(data) {
     let totals_data = total_to_from_data(data);
 
     d3.select('#graph0')
-        .attr('height', 450);
+        .attr('height', 450)
+        .attr('width', 1000);
 
     set_graph_0_pie(totals_data, data.names);
 
