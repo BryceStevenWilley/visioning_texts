@@ -91,13 +91,12 @@ function split_b_k_whatsapp(text) {
                     ]};
         } else {
             // ambiguity: still empty
-            console.log('ambigious');
-            console.log(l);
             return {};
         }
     }, {});
     if (!used['regex']) {
         console.log("The input file has an ambigious date format. TODO(brycew): fix");
+        console.log("Example line: " + lines[0]);
     }
 
     lines = lines.slice(1);
