@@ -94,7 +94,6 @@ function set_graph_0_whisk(just_data, elem_id, color, description) {
     // Stats
     let min = getMin(just_data)
     let max = getMax(just_data)
-    console.log(min)
     let data_sorted = just_data.sort(d3.ascending);
     let q1 = d3.quantile(data_sorted, .25);
     let median = d3.quantile(data_sorted, .5);
