@@ -20,11 +20,6 @@ function split_b_k(data, b_ids, k_ids, b_name, k_name, address_id) {
     return {'names' : [b_name, k_name], 'data' : full_data};
 }
 
-var my_regex = /(\d+)\/(\d+)\/(\d+)/;
-var mm_dd_regex = /^(((0)?[0-9])|((1)[0-2]))([\.\/])([1-9]|[0-2][0-9]|3[0-1])([\.\/])(\d{2}|\d{4}), ([0-9]?[0-9]):([0-9][0-9])(:[0-9][0-9])?( [aApP][mM])? -/;
-var international_regex = /^([1-9]|[0-2][0-9]|3[0-1])([\.\/])(((0)?[0-9])|((1)[0-2]))([\.\/])(\d{2}|\d{4}), ([0-9]?[0-9]):([0-9][0-9])(:[0-9][0-9])?( [aApP][mM])? -/;
-var brace_regex = /^\[([1-9]|[0-2][0-9]|(3)[0-1])([\.\/])(((0)?[0-9])|((1)[0-2]))([\.\/])(\d{2}|\d{4}), (([0-9])?[0-9]):([0-9][0-9])(:[0-9][0-9])?( [aApP][mM])?\]/;
-
 function split_b_k_facebook(text) {
     const json = JSON.parse(text);
     const names = json.participants.map((p) => p.name);
@@ -44,82 +39,95 @@ function split_b_k_facebook(text) {
     };
 }
 
+var datetime_regex = /(([0-9])?[0-9])([\.\/])(([0-9])?[0-9])([\.\/])(\d{2}|\d{4}), (([0-9])?[0-9]):([0-9][0-9])(:[0-9][0-9])?( [aApP]\.?[mM]\.?)?/;
+var brace_front = /^\[/;
+var no_brace_front = /^/;
+var brace_back = /\]/;
+
+
 function split_b_k_whatsapp(text) {
     let lines = text.split('\n').filter(function(d) { return d.length != 0; });
-    var used_regex;
-    var used_delim;
-    var used_formats;
-    let time_s_a = 'HH:mm:ss a';
-    let time_m = 'HH:mm a';
-    let time_s = 'HH:mm:ss';
-    let time_ = 'HH:mm';
+    let use_braces = '';
+    let date_split = '/';
+    let use_meridan = '';
+    let use_hacky_rm = false;
+    let date_regexx = datetime_regex;
+    let delim_str = '-';
+    let test_line = lines[0];
+    if (test_line[0] == '[') {
+        use_braces = '[';
+        delim_str = ']'
+        date_regexx = new RegExp(brace_front.source + datetime_regex.source + brace_back.source);
+    } else {
+        delim_str = '-';
+        date_regexx = new RegExp(no_brace_front.source + datetime_regex.source);
+    }
+
     let used = lines.reduce(function(used_st, l) {
         if (used_st['regex']) {
             return used_st;
         }
-        let match_mm_dd = mm_dd_regex.test(l);
-        let match_international = international_regex.test(l);
-        let match_brace = brace_regex.test(l);
-        // TODO(brycew): this is awful. Find a better way to support locales?
-        if (match_mm_dd && !match_international && !match_brace) {
-            return {'regex' :mm_dd_regex,
-                    'delim' : '-',
-                    'formats' : [
-                        'M/D/YY, ' + time_,
-                        'M/D/YY, ' + time_m,
-                        'M/D/YY, ' + time_s,
-                        'M/D/YY, ' + time_s_a,
-                        'M/D/YYYY, ' + time_,
-                        'M/D/YYYY, ' + time_m,
-                        'M/D/YYYY, ' + time_s,
-                        'M/D/YYYY, ' + time_s_a,
-                                ]};
-        } else if (match_international && !match_mm_dd && !match_brace) {
-            return {'regex' :international_regex,
-                    'delim' : '-',
-                    'formats' : [
-                        'D/M/YY, ' + time_,
-                        'D/M/YY, ' + time_m,
-                        'D/M/YY, ' + time_s,
-                        'D/M/YY, ' + time_s_a,
-                        'D/M/YYYY, ' + time_,
-                        'D/M/YYYY, ' + time_m,
-                        'D/M/YYYY, ' + time_s,
-                        'D/M/YYYY, ' + time_s_a,
-                    ]};
-        } else if (match_brace && !match_mm_dd && !match_international) {
-            return {'regex' : brace_regex,
-                    'delim' : ']',
-                    'formats' : [
-                        '[D.M.YY, ' + time_,
-                        '[D.M.YY, ' + time_m,
-                        '[D.M.YY, ' + time_s,
-                        '[D.M.YY, ' + time_s_a,
-                        '[D.M.YYYY, ' + time_,
-                        '[D.M.YYYY, ' + time_m,
-                        '[D.M.YYYY, ' + time_s,
-                        '[D.M.YYYY, ' + time_s_a,
-                        '[D/M/YY, ' + time_,
-                        '[D/M/YY, ' + time_m,
-                        '[D/M/YY, ' + time_s,
-                        '[D/M/YY, ' + time_s_a,
-                        '[D/M/YYYY, ' + time_,
-                        '[D/M/YYYY, ' + time_m,
-                        '[D/M/YYYY, ' + time_s,
-                        '[D/M/YYYY, ' + time_s_a,
-                    ]};
-        } else {
-            // ambiguity: still empty
-            return {};
+        if (!date_regexx.test(l)) {
+            return used_st; // New lines middle of the message likely
         }
+
+        let matches = l.match(date_regexx);
+        if (matches[3] && matches[3] == '.' && matches[6] && matches[6] == '.') {
+            date_split = '.';
+        }
+        if (matches[12]) {
+            if (matches[12] == ' a.m.' || matches[12] == ' p.m.') {
+                use_meridan = ' a';
+                use_hacky_rm = true;
+            } else {
+                use_hacky_rm = false;
+                if (matches[12] == ' AM' || matches[12] == ' PM') {
+                    use_meridan = ' A';
+                } else {
+                    use_meridan = ' a';
+                }
+            }
+        }
+        let year_str = 'YY';
+        if (matches[7]) {
+            if (matches[7].length == 2) {
+                year_str = 'YY';
+            } else if (matches[7].length == 4) {
+                year_str = 'YYYY';
+            } else {
+                console.log('WARNING: Found a strange year format: ' + matches[7] + ', ' + l);
+            }
+        }
+        let seconds_str = '';
+        if (matches[11]) {
+            seconds_str = ':ss';
+        }
+
+        if (matches[1] && matches[4]) {
+            let first_int = parseInt(matches[1], 10);
+            if (first_int > 12) {
+                let date_fmt = use_braces + 'D' + date_split + 'M' + date_split + year_str
+                    + ', H:mm' + seconds_str + use_meridan;
+                return {'regex' : date_regexx, 'delim' : delim_str, 'formats' : [date_fmt]};
+            }
+            let second_int = parseInt(matches[4], 10);
+            if (second_int > 12) {
+                let date_fmt = use_braces + 'M' + date_split + 'D' + date_split + year_str
+                    + ', H:mm' + seconds_str + use_meridan;
+                return {'regex' : date_regexx, 'delim' : delim_str, 'formats' : [date_fmt]};
+            }
+        }
+
+        // ambiguity: still empty
+        return {'best_guess' : use_braces + 'M' + date_split + 'D' + date_split + year_str
+                + ', H:mm' + seconds_str + use_meridan};
     }, {});
     if (!used['regex']) {
-        console.log("The input file has an ambigious date format. TODO(brycew): fix");
-        console.log("Example line: " + lines[0]);
-        return [];
+        console.log("The input file has an ambigious date format, i.e. couldn't tell if MM/DD or DD/MM. Using MM/DD");
+        used['regex'] = date_regexx;
+        used = {'regex' : date_regexx, 'delim' : delim_str, 'formats' : [used.best_guess]};
     }
 
-    lines = lines.slice(1);
     lines = lines.reduce(function(total, l) {
         let delim_idx = l.indexOf(used.delim);
         let time_str = l.slice(0, delim_idx);
@@ -133,14 +141,24 @@ function split_b_k_whatsapp(text) {
     let full_data = lines.map(function(l) {
         let delim_idx = l.indexOf(used.delim);
         let time_str = l.slice(0, delim_idx);
+        if (use_hacky_rm) {
+            time_str = time_str.replace('.', '');
+        }
         let rest_str = l.slice(delim_idx + 1);
         let colon_idx = rest_str.indexOf(':');
+        if (colon_idx == -1) {
+            // Found a weird whatsapp notification. Delete
+            return {'name' : 'DELETE_ME'};
+        }
         let name_str = rest_str.slice(0, colon_idx);
         let msg_str = rest_str.slice(colon_idx + 1);
         return {'name' : name_str.trim().split(' ')[0], 'BODY' : msg_str.trim(),
                 'date' : moment(time_str.trim(), used.formats).toDate()};
     });
-    let names = full_data.reduce(function(total, d) {
+    let full_filtered_data = full_data.filter(function(d) {
+        return d.name != 'DELETE_ME';
+    });
+    let names = full_filtered_data.reduce(function(total, d) {
         total.add(d.name);
         return total;
     }, new Set());
@@ -150,7 +168,7 @@ function split_b_k_whatsapp(text) {
         console.log(list_names);
     }
 
-    return {'names' : list_names, 'data': full_data};
+    return {'names' : list_names, 'data': full_filtered_data};
 }
 
 function word_split(row) {
