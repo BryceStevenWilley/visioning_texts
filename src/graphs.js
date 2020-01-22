@@ -461,9 +461,16 @@ function handleFileSelect(evt) {
         // files is a FileList of File objects. List some properties.
         file_to_read = files[0];
         let f = file_to_read;
-        if (f.type != 'text/plain' && f.type != 'text/csv' && f.type != 'application/json' &&
-            f.type != 'application/vnd.ms-excel') { // Excel does weird shit sometimes
-                // https://stackoverflow.com/a/28233618/11416267
+        if (f.type == 'text/plain' || (!f.type && f.name.indexOf('.txt') != -1)) {
+            file_type = 'whatsapp_text';
+        } else if (f.type == 'text/csv' || f.type == 'application/vnd.ms.excel' ||
+                   (!f.type && f.name.indexOf('.csv') != -1)) {
+            // If excel is installed on window's system, csv will be reported as excel from the
+            // registary: https://stackoverflow.com/a/28233618/11416267
+            file_type = 'signal_csv';
+        } else if (f.type == 'application/json' || (!f.type && f.name.indexOf('.json') != -1)) {
+            file_type = 'fb_json';
+        } else {
             alert("Can't read this type of file (" + f.type + ") at the moment."
                   + " Please try a Signal csv, a WhatsApp text file, or a Facebook json file.");
             return;
@@ -481,7 +488,7 @@ function handleFileSelect(evt) {
             (f.lastModifiedDate ?
              f.lastModifiedDate.toLocaleDateString() : 'n/a') +
             '</li></ul>';
-        if (f.type == 'text/csv' || f.type == 'application/vnd.ms-excel') {
+        if (file_type == 'signal_csv') {
             d3.select('#signal_input_table').classed('hide', false);
         }
         d3.select('button').classed('hide', false);
@@ -503,12 +510,12 @@ function trigger_process(f) {
             let b_ids = string_to_int_array(document.getElementById('b_ids_input').value);
             let k_ids = string_to_int_array(document.getElementById('k_ids_input').value);
             var data;
-            if (f.type == 'text/csv' || f.type == 'application/vnd.ms-excel') {
+            if (file_type == 'signal_csv') {
                 let csv_obj = d3.csvParse(e.target.result);
                 data = split_b_k(csv_obj, b_ids, k_ids, b_name, k_name, address_id);
-            } else if (f.type == 'text/plain') {
+            } else if (file_type == 'whatsapp_text') {
                 data = split_b_k_whatsapp(e.target.result);
-            } else if (f.type == 'application/json') {
+            } else if (file_type == 'fb_json') {
                 data = split_b_k_facebook(e.target.result);
             }
             set_graph_0(data);

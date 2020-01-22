@@ -56,7 +56,7 @@ function split_b_k_whatsapp(text) {
     let test_line = lines[0];
     if (test_line[0] == '[') {
         use_braces = '[';
-        delim_str = ']'
+        delim_str = ']';
         date_regexx = new RegExp(brace_front.source + datetime_regex.source + brace_back.source);
     } else {
         delim_str = '-';
