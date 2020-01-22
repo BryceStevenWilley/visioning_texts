@@ -116,6 +116,7 @@ function split_b_k_whatsapp(text) {
     if (!used['regex']) {
         console.log("The input file has an ambigious date format. TODO(brycew): fix");
         console.log("Example line: " + lines[0]);
+        return [];
     }
 
     lines = lines.slice(1);
