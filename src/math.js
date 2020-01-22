@@ -24,7 +24,7 @@ function split_b_k_facebook(text) {
     const json = JSON.parse(text);
     const names = json.participants.map((p) => p.name);
     const data = json.messages.filter((msg) => {
-        return msg.type == "Generic" && msg.content
+        return msg.type == "Generic" && msg.content;
     }).map( (msg) => {
         return {
             'name': msg.sender_name,
@@ -39,7 +39,7 @@ function split_b_k_facebook(text) {
     };
 }
 
-var datetime_regex = /(([0-9])?[0-9])([\.\/])(([0-9])?[0-9])([\.\/])(\d{2}|\d{4}), (([0-9])?[0-9]):([0-9][0-9])(:[0-9][0-9])?( [aApP]\.?[mM]\.?)?/;
+var datetime_regex = /(([0-9])?[0-9])([\.\/])(([0-9])?[0-9])([\.\/])(\d{2}|\d{4})(,)? (([0-9])?[0-9]):([0-9][0-9])(:[0-9][0-9])?( [aApP]\.?[mM]\.?)?/;
 var brace_front = /^\[/;
 var no_brace_front = /^/;
 var brace_back = /\]/;
@@ -75,13 +75,13 @@ function split_b_k_whatsapp(text) {
         if (matches[3] && matches[3] == '.' && matches[6] && matches[6] == '.') {
             date_split = '.';
         }
-        if (matches[12]) {
-            if (matches[12] == ' a.m.' || matches[12] == ' p.m.') {
+        if (matches[13]) {
+            if (matches[13] == ' a.m.' || matches[13] == ' p.m.') {
                 use_meridan = ' a';
                 use_hacky_rm = true;
             } else {
                 use_hacky_rm = false;
-                if (matches[12] == ' AM' || matches[12] == ' PM') {
+                if (matches[13] == ' AM' || matches[13] == ' PM') {
                     use_meridan = ' A';
                 } else {
                     use_meridan = ' a';
@@ -99,21 +99,25 @@ function split_b_k_whatsapp(text) {
             }
         }
         let seconds_str = '';
-        if (matches[11]) {
+        if (matches[12]) {
             seconds_str = ':ss';
+        }
+        let comma_sep = '';
+        if (matches[8]) {
+            comma_sep = matches[8];
         }
 
         if (matches[1] && matches[4]) {
             let first_int = parseInt(matches[1], 10);
             if (first_int > 12) {
                 let date_fmt = use_braces + 'D' + date_split + 'M' + date_split + year_str
-                    + ', H:mm' + seconds_str + use_meridan;
+                    + comma_sep + ' H:mm' + seconds_str + use_meridan;
                 return {'regex' : date_regexx, 'delim' : delim_str, 'formats' : [date_fmt]};
             }
             let second_int = parseInt(matches[4], 10);
             if (second_int > 12) {
                 let date_fmt = use_braces + 'M' + date_split + 'D' + date_split + year_str
-                    + ', H:mm' + seconds_str + use_meridan;
+                    + comma_sep + ' H:mm' + seconds_str + use_meridan;
                 return {'regex' : date_regexx, 'delim' : delim_str, 'formats' : [date_fmt]};
             }
         }

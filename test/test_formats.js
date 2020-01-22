@@ -20,5 +20,6 @@ function run_all_formats(evt) {
             })(f);
             reader.readAsText(f);
         }
+        console.log('Got to end');
     }
 }
