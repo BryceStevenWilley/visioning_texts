@@ -481,7 +481,7 @@ function handleFileSelect(evt) {
             (f.lastModifiedDate ?
              f.lastModifiedDate.toLocaleDateString() : 'n/a') +
             '</li></ul>';
-        if (f.type == 'text/csv') {
+        if (f.type == 'text/csv' || f.type == 'application/vnd.ms-excel') {
             d3.select('#signal_input_table').classed('hide', false);
         }
         d3.select('button').classed('hide', false);
