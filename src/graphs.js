@@ -67,11 +67,33 @@ function set_graph_0_pie(totals_data, names) {
         });
     t2.exit().remove();
 }
+function getMin(arr)
+{
+    let length=arr.length;
+    let min=Infinity
+
+    while(length--)
+    {
+        min=arr[length]<min ? arr[length] : min
+    }
+    return min;
+}
+
+function getMax(arr) {
+    let length = arr.length;
+    let max = -Infinity;
+
+    while (length--) {
+        max = arr[length] > max ? arr[length] : max;
+    }
+    return max;
+}
+
 
 function set_graph_0_whisk(just_data, elem_id, color, description) {
     // Stats
-    let min = Math.min(...just_data);
-    let max = Math.max(...just_data);
+    let min = getMin(just_data)
+    let max = getMax(just_data)
     let data_sorted = just_data.sort(d3.ascending);
     let q1 = d3.quantile(data_sorted, .25);
     let median = d3.quantile(data_sorted, .5);
