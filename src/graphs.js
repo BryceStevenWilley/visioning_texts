@@ -75,7 +75,8 @@ function set_graph_0_whisk(stats, is_zoom_bar, mid, prev_bars, elem_id, color, d
 
     let xScale = d3.scaleLinear().domain([stats.min, stats.max]).range([0, 800]);
     if (prev_bars.length != 0) {
-        xScale = d3.scaleLinear().domain([stats.min, stats.q3 + 1.5 * stats.interQuantileRange]).range([0, 700]);
+        xScale = d3.scaleLinear().domain([stats.min, stats.q3 + 1.5 * stats.interQuantileRange])
+            .range([0, 700]);
     }
 
     d3.select(elem_id + '_line')
@@ -124,7 +125,6 @@ function set_graph_0_whisk(stats, is_zoom_bar, mid, prev_bars, elem_id, color, d
         c.exit().remove();
     }
 
-    console.log(elem_id + ", " + prev_bars + ", " + is_zoom_bar);
     let label_data = [stats.min, min_bar, stats.median, max_bar, stats.max];
     if (is_zoom_bar && prev_bars.length == 0) {
         label_data = [stats.max];
@@ -143,7 +143,7 @@ function set_graph_0_whisk(stats, is_zoom_bar, mid, prev_bars, elem_id, color, d
         .attr('alignment-baseline', 'baseline')
         .attr('fill', 'white');
 
-    if (!is_zoom_bar) {
+    if (prev_bars.length == 0) {
         return [xScale(min_bar), xScale(max_bar)];
     } else {
         return [];
@@ -171,7 +171,7 @@ function set_graph_0(data) {
 
     let height = 460;
     let tall_height = 0;
-    if (word_stats.max - word_stats.q3 > 10 * word_stats.interQuantileRange) {
+    if (word_stats.max - word_stats.q3 > 10 * word_stats.interQuantileRange * 2) {
         height += 100;
         tall_height = 460;
         let bars = set_graph_0_whisk(word_stats, true, 0, [],

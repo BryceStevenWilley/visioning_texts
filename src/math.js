@@ -208,27 +208,6 @@ function total_to_from_data(data) {
     });
 }
 
-function getMin(arr) {
-    let length = arr.length;
-    let min = Infinity;
-
-    while(length--) {
-        min = arr[length] < min ? arr[length] : min;
-    }
-    return min;
-}
-
-function getMax(arr) {
-    let length = arr.length;
-    let max = -Infinity;
-
-    while (length--) {
-        max = arr[length] > max ? arr[length] : max;
-    }
-    return max;
-}
-
-
 function get_statistics(just_data) {
     // Stats
     let data_sorted = just_data.sort(d3.ascending);
