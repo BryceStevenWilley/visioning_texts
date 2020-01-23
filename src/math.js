@@ -30,7 +30,7 @@ function split_b_k_facebook(text) {
             'name': msg.sender_name,
             'date': new Date(msg.timestamp_ms),
             'ID': `${msg.sender_name}_${msg.timestamp_ms}`,
-            'BODY': msg.content
+            'BODY': decodeURIComponent(escape(msg.content))
         };
     });
     return {
