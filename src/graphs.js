@@ -67,59 +67,45 @@ function set_graph_0_pie(totals_data, names) {
         });
     t2.exit().remove();
 }
-function getMin(arr)
-{
-    let length=arr.length;
-    let min=Infinity
 
-    while(length--)
-    {
-        min=arr[length]<min ? arr[length] : min
-    }
-    return min;
-}
-
-function getMax(arr) {
-    let length = arr.length;
-    let max = -Infinity;
-
-    while (length--) {
-        max = arr[length] > max ? arr[length] : max;
-    }
-    return max;
-}
-
-
-function set_graph_0_whisk(just_data, elem_id, color, description) {
-    // Stats
-    let min = getMin(just_data)
-    let max = getMax(just_data)
-    let data_sorted = just_data.sort(d3.ascending);
-    let q1 = d3.quantile(data_sorted, .25);
-    let median = d3.quantile(data_sorted, .5);
-    let q3 = d3.quantile(data_sorted, .75);
-    let interQuantileRange = q3 - q1;
-    let min_bar = Math.max(min, q1 - 1.5 * interQuantileRange);
-    let max_bar = Math.min(max, q3 + 1.5 * interQuantileRange);
+function set_graph_0_whisk(stats, is_zoom_bar, mid, prev_bars, elem_id, color, description) {
+    let min_bar = Math.max(stats.min, stats.q1 - 1.5 * stats.interQuantileRange);
+    let max_bar = Math.min(stats.max, stats.q3 + 1.5 * stats.interQuantileRange);
     let height = 32;
-    let mid = 0;
 
-    let xScale = d3.scaleLinear().domain([0, max]).range([0, 800]);
+    let xScale = d3.scaleLinear().domain([stats.min, stats.max]).range([0, 800]);
+    if (prev_bars.length != 0) {
+        xScale = d3.scaleLinear().domain([stats.min, stats.q3 + 1.5 * stats.interQuantileRange]).range([0, 700]);
+    }
 
     d3.select(elem_id + '_line')
         .attr('y1', mid).attr('y2', mid)
         .attr('x1', xScale(min_bar)).attr('x2', xScale(max_bar))
         .attr('stroke', 'white');
 
+    if (prev_bars.length != 0) {
+        d3.select(elem_id + '_connection')
+            .attr('stroke', 'white')
+            .attr('y1', prev_bars[0]).attr('y2', mid)
+            .attr('x1', prev_bars[1][0] - 1)
+            .attr('x2', stats.min - 2);
+
+        d3.select(elem_id + '_connection2')
+            .attr('stroke', 'white')
+            .attr('y1', prev_bars[0]).attr('y2', mid)
+            .attr('x1', prev_bars[1][1] - 1)
+            .attr('x2', 700);
+    }
+
     d3.select(elem_id + '_box')
         .attr('y', mid - height / 2)
-        .attr('x', xScale(q1))
+        .attr('x', xScale(stats.q1))
         .attr('height', height)
-        .attr('width', (xScale(q3) - xScale(q1)))
+        .attr('width', (xScale(stats.q3) - xScale(stats.q1)))
         .attr('stroke', 'white')
         .attr('fill', color);
 
-    let u = d3.select(elem_id + '_whisk').selectAll('line').data([min_bar, median, max_bar]);
+    let u = d3.select(elem_id + '_whisk').selectAll('line').data([min_bar, stats.median, max_bar]);
     u.enter().append('line').merge(u)
         .attr('y1', mid - height / 2)
         .attr('y2', mid + height / 2)
@@ -128,18 +114,22 @@ function set_graph_0_whisk(just_data, elem_id, color, description) {
         .attr('stroke', 'white');
     u.exit().remove();
 
-    let outliers = just_data.filter(function(d) {
-        return d < min_bar || d > max_bar;
-    });
-    let c = d3.select(elem_id + '_whisk').selectAll('circle').data([min, max]); //outliers);
-    c.enter().append('circle').merge(c)
-        .attr('cy', mid)
-        .attr('cx', function(d) { return xScale(d); })
-        .attr('r', 3)
-        .attr('fill', 'white');
-    c.exit().remove();
+    if (!is_zoom_bar) {
+        let c = d3.select(elem_id + '_whisk').selectAll('circle').data([stats.min, stats.max]);
+        c.enter().append('circle').merge(c)
+            .attr('cy', mid)
+            .attr('cx', function(d) { return xScale(d); })
+            .attr('r', 3)
+            .attr('fill', 'white');
+        c.exit().remove();
+    }
 
-    let t = d3.select(elem_id + '_labels').selectAll('text').data([min, min_bar, median, max_bar, max]);
+    console.log(elem_id + ", " + prev_bars + ", " + is_zoom_bar);
+    let label_data = [stats.min, min_bar, stats.median, max_bar, stats.max];
+    if (is_zoom_bar && prev_bars.length == 0) {
+        label_data = [stats.max];
+    }
+    let t = d3.select(elem_id + '_labels').selectAll('text').data(label_data);
     t.enter().append('text').merge(t)
         .attr('x', function(d) { return xScale(d); })
         .attr('y', mid + height)
@@ -152,14 +142,16 @@ function set_graph_0_whisk(just_data, elem_id, color, description) {
         .attr('y', mid - height)
         .attr('alignment-baseline', 'baseline')
         .attr('fill', 'white');
+
+    if (!is_zoom_bar) {
+        return [xScale(min_bar), xScale(max_bar)];
+    } else {
+        return [];
+    }
 }
 
 function set_graph_0(data) {
     let totals_data = total_to_from_data(data);
-
-    d3.select('#graph0')
-        .attr('height', 450)
-        .attr('width', 1000);
 
     set_graph_0_pie(totals_data, data.names);
 
@@ -168,14 +160,43 @@ function set_graph_0(data) {
     }).reduce(function(total, d) {
         return total.concat(d);
     }, []);
-    set_graph_0_whisk(just_words, '#graph0_word', 'green', 'Words per text');
+    let word_stats = get_statistics(just_words);
 
     let just_chars = totals_data.map(function(d) {
         return d.chars;
     }).reduce(function(total, d) {
         return total.concat(d);
     }, []);
-    set_graph_0_whisk(just_chars, '#graph0_char', 'green', 'Characters per text');
+    let char_stats = get_statistics(just_chars);
+
+    let height = 460;
+    let tall_height = 0;
+    if (word_stats.max - word_stats.q3 > 10 * word_stats.interQuantileRange) {
+        height += 100;
+        tall_height = 460;
+        let bars = set_graph_0_whisk(word_stats, true, 0, [],
+                                     '#graph0_word', 'green',
+                                     'Words per text');
+        set_graph_0_whisk(word_stats, true, 75, [0, bars], '#graph0_word_zoom', 'green', '');
+    } else {
+        tall_height = 370;
+        set_graph_0_whisk(word_stats, false, 0, [], '#graph0_word', 'green', 'Words per text');
+    }
+    d3.select('#graph0_char').attr('transform', 'translate(50, ' + tall_height + ')');
+    if (char_stats.max - char_stats.q3 > 10 * char_stats.interQuantileRange) {
+        height += 100;
+        let bars = set_graph_0_whisk(char_stats, true, 0, [],
+                                     '#graph0_char', 'green',
+                                     'Characters per text');
+        set_graph_0_whisk(char_stats, true, 75, [0, bars],
+                          '#graph0_char_zoom', 'green', '');
+    } else {
+        set_graph_0_whisk(char_stats, false, 0, [], '#graph0_char', 'green', 'Characters per text');
+    }
+
+    d3.select('#graph0')
+        .attr('height', height)
+        .attr('width', 1000);
 }
 
 function set_graph_1(data, day) {

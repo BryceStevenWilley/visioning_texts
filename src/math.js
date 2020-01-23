@@ -208,6 +208,42 @@ function total_to_from_data(data) {
     });
 }
 
+function getMin(arr) {
+    let length = arr.length;
+    let min = Infinity;
+
+    while(length--) {
+        min = arr[length] < min ? arr[length] : min;
+    }
+    return min;
+}
+
+function getMax(arr) {
+    let length = arr.length;
+    let max = -Infinity;
+
+    while (length--) {
+        max = arr[length] > max ? arr[length] : max;
+    }
+    return max;
+}
+
+
+function get_statistics(just_data) {
+    // Stats
+    let data_sorted = just_data.sort(d3.ascending);
+    let q1 = d3.quantile(data_sorted, .25);
+    let q3 = d3.quantile(data_sorted, .75);
+    return {
+        'min' : data_sorted[0],
+        'max' : data_sorted[data_sorted.length - 1],
+        'q1' : q1,
+        'median' : d3.quantile(data_sorted, .5),
+        'q3' : q3,
+        'interQuantileRange' : q3 - q1
+    };
+}
+
 function xy_time_of_day(data) {
     let all_times= [];
     for (var i = 0; i < 24 * 7; i++) {
