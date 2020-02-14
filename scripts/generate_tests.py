@@ -49,6 +49,7 @@ def main():
     all_date_strs = dash_date_strs + dot_date_strs
     for dt_template in itertools.product(all_date_strs, time_strs, full_datetime_strs):
         out_file = open(uuid.uuid4().hex + '.txt', 'w')
+        out_file.write('a\n') # Test for bad starts
         for data in sample_data:
             d = data[0]
             AP = 'AM' if d.hour < 12 else 'PM'

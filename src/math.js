@@ -52,15 +52,29 @@ function split_b_k_whatsapp(text) {
     let use_meridan = '';
     let use_hacky_rm = false;
     let date_regexx = datetime_regex;
-    let delim_str = '-';
-    let test_line = lines[0];
-    if (test_line[0] == '[') {
-        use_braces = '[';
-        delim_str = ']';
-        date_regexx = new RegExp(brace_front.source + datetime_regex.source + brace_back.source);
-    } else {
-        delim_str = '-';
-        date_regexx = new RegExp(no_brace_front.source + datetime_regex.source);
+    let delim_str = '';
+    let idx = 0;
+    let test_line = lines[idx].trim();
+    while (delim_str == '' && idx < lines.length) {
+        if (datetime_regex.test(test_line)) {
+            if (test_line[0] == '[') {
+                use_braces = '[';
+                delim_str = ']';
+                date_regexx = new RegExp(brace_front.source +
+                                         datetime_regex.source + brace_back.source);
+            } else {
+                delim_str = '-';
+                date_regexx = new RegExp(no_brace_front.source + datetime_regex.source);
+            }
+        } else {
+            idx += 1;
+            test_line = lines[idx].trim();
+        }
+    }
+
+    if (idx == lines.length) {
+        console.log('WARNING: did not match a date time anywhere in the file: example line: '
+                    + lines[0]);
     }
 
     let used = lines.reduce(function(used_st, l) {
@@ -126,8 +140,10 @@ function split_b_k_whatsapp(text) {
         return {'best_guess' : use_braces + 'M' + date_split + 'D' + date_split + year_str
                 + ', H:mm' + seconds_str + use_meridan};
     }, {});
+
     if (!used['regex']) {
         console.log("The input file has an ambigious date format, i.e. couldn't tell if MM/DD or DD/MM. Using MM/DD");
+        console.log("Example line: " + lines[0]);
         used['regex'] = date_regexx;
         used = {'regex' : date_regexx, 'delim' : delim_str, 'formats' : [used.best_guess]};
     }
@@ -138,7 +154,9 @@ function split_b_k_whatsapp(text) {
         if (l.match(used.regex)) {
             total.push(l);
         } else {
-            total[total.length - 1] = total[total.length - 1].concat(l);
+            if (total.length > 0) {
+                total[total.length - 1] = total[total.length - 1].concat(l);
+            }
         }
         return total;
     }, []);
