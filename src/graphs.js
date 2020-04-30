@@ -424,6 +424,9 @@ function set_graph_4(emoji_count) {
             return '<h3>' + d.name + '\'s</h3>\n<svg id="graph4_' + i + '"></svg>';
         });
     u.exit().remove();
+    d3.select('#graph4_wrapper')
+        .selectAll('div')
+        .classed('blocked', true);
 
     emoji_count.forEach(function(n_c, i) {
         let emoji_count_b = n_c.emoji_count;

@@ -62,3 +62,8 @@ input[type=file] {
     padding: 3px 5px;
     cursor: pointer;
 }
+
+.blocked {
+    display: inline-block;
+    vertical-align: top;
+}
