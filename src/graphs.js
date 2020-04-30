@@ -115,15 +115,17 @@ function set_graph_0_whisk(stats, is_zoom_bar, mid, prev_bars, elem_id, color, d
         .attr('stroke', 'white');
     u.exit().remove();
 
+    let to_add_dots = [stats.min, stats.max];
     if (!is_zoom_bar) {
-        let c = d3.select(elem_id + '_whisk').selectAll('circle').data([stats.min, stats.max]);
-        c.enter().append('circle').merge(c)
-            .attr('cy', mid)
-            .attr('cx', function(d) { return xScale(d); })
-            .attr('r', 3)
-            .attr('fill', 'white');
-        c.exit().remove();
+        to_add_dots = [stats.max];
     }
+    let c = d3.select(elem_id + '_whisk').selectAll('circle').data(to_add_dots);
+    c.enter().append('circle').merge(c)
+        .attr('cy', mid)
+        .attr('cx', function(d) { return xScale(d); })
+        .attr('r', 3)
+        .attr('fill', 'white');
+    c.exit().remove();
 
     let label_data = [stats.min, min_bar, stats.median, max_bar, stats.max];
     if (is_zoom_bar && prev_bars.length == 0) {
@@ -430,8 +432,13 @@ function set_graph_4(emoji_count) {
 
     emoji_count.forEach(function(n_c, i) {
         let emoji_count_b = n_c.emoji_count;
-        let width = 50 * Math.sqrt(emoji_count_b.length);
-        let height = 50 * Math.sqrt(emoji_count_b.length);
+        // Treat the sum as the total volume the emojis take up.
+        let just_counts = emoji_count_b.map((em) => em[0]);
+        let all_emoji_sum = just_counts.reduce((tot, a) => tot + a, 0);
+        let all_emoji_max = just_counts.reduce((max, a) => Math.max(max, a), 0);
+        let volume_scale = d3.scaleLinear().domain([0, all_emoji_max]).range([0, 50]);
+        let width = 680;
+        let height = 680;
         d3.select('#graph4_' + i)
             .attr('width', width)
             .attr('height', height);
@@ -440,7 +447,7 @@ function set_graph_4(emoji_count) {
             .force('charge', d3.forceManyBody().strength(5))
             .force('center', d3.forceCenter(width / 2, height / 2))
             .force('collision', d3.forceCollide().radius(function(d) {
-                return Math.sqrt(emoji_scale * d[0]) / Math.PI * 1.05;
+                return Math.sqrt(emoji_scale * volume_scale(d[0])) / Math.PI * 1.05;
             }))
             .on('tick', ticked);
 
@@ -451,7 +458,7 @@ function set_graph_4(emoji_count) {
             .append('g')
             .merge(u)
             .html(function(d) {
-                let emoji_rad = Math.sqrt(emoji_scale * d[0]) / Math.PI;
+                let emoji_rad = Math.sqrt(emoji_scale * volume_scale(d[0])) / Math.PI;
                 let font_size = emoji_rad * 1.74;
                 let scoot_y = font_size / 2.78;
                 return '<text text-anchor="middle" y="' + scoot_y

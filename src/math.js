@@ -194,7 +194,7 @@ function split_b_k_whatsapp(text) {
 }
 
 function word_split(row) {
-    return row.BODY.replace(/[.,!?\n]/g, '');
+    return row.BODY.replace(/[.,!?\t\n]/g, ' ');
 }
 
 function word_reduce(all_words, msg) {
@@ -427,12 +427,13 @@ function emoji_filter(word_count_map) {
         let tmp_map = {}, key_word;
         for (key_word in x.word_count) {
             if (x.word_count.hasOwnProperty(key_word) && key_word.match(emoji_rgx)) {
+                let count = x.word_count[key_word];
                 let graphemes = splitter.iterateGraphemes(key_word);
                 let result = graphemes.next();
                 while (!result.done) {
                     let emj = result.value;
                     if (emoji_rgx.test(emj)) {
-                        tmp_map[emj] = tmp_map[emj] ? tmp_map[emj] + 1 : 1;
+                        tmp_map[emj] = tmp_map[emj] ? tmp_map[emj] + count : count;
                     }
                     result = graphemes.next();
                 }
