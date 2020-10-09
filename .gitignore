@@ -2,3 +2,4 @@ test/data/*
 
 # Personal Signal backup folder
 private/*
+node_modules
