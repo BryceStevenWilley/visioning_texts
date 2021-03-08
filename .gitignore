@@ -1,0 +1,4 @@
+test/data/*
+
+# Personal Signal backup folder
+private/*
