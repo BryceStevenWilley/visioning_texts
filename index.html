@@ -2,156 +2,151 @@
 <html>
     <head>
         <title>Visioning Messages</title>
+        <base href="./"/>
         <meta charset="UTF-8">
-        <script type="text/javascript" src="lib/grapheme-splitter.js"></script>
-        <script type="text/javascript" src="lib/d3.min.js"></script>
-        <script type="text/javascript" src="lib/moment.js"></script>
-        <script type="text/javascript" src="src/math.js"></script>
-        <script type="text/javascript" src="src/graphs.js"></script>
         <link rel="icon"  type="image/png" href="favicon.png">
         <link rel="stylesheet"  href="css/stylesheet.css" typet="text/css" charset="utf-8"/>
     </head>
 
     <body>
-        <header class="page_title" >
+        <header class="page-title" >
             <h1>Visioning Texts</h1>
             <h3>Made by <a href="https://brycewilley.xyz">Bryce Willey</a></h3>
-            <aside><a href="setup_instructions.html">Help</a>
+            <aside><a href="setup_instructions.html">Help</a></aside>
         </header>
         <br/>
-        <label for="file_select" class="custom-file-upload">
+        <label for="file-select" class="custom-file-upload">
             Choose your Messages File
         </label>
-        <input type="file" id="file_select"  names="file[]" class="flat_buttons" />
+        <input type="file" id="file-select"  names="file[]" class="flat-buttons" />
         <output id="list" ></output>
-        <table id="signal_input_table" class="hide">
+        <table id="signal-input-table" class="hide">
             <tr>
                 <td>Address: </td>
                 <td>
-                    <input name="address_input" id="address_input" type="text" value="171" />
+                    <input name="address-input" id="address-input" type="text" value="171" />
                 </td>
             </tr>
             <tr>
                 <td>Name 1:</td>
                 <td>
-                    <input name="b_name_input" id="b_name_input" type="text" value="Bob" />
+                    <input name="b-name-input" id="b-name-input" type="text" value="Bob" />
                 </td>
                 <td>Ids:</td>
                 <td>
-                    <input name="b_ids_input" id="b_ids_input" type="text" value="23" />
+                    <input name="b-ids-input" id="b-ids-input" type="text" value="23" />
                 </td>
             </tr>
             <tr>
                 <td>Name 2:</td>
                 <td>
-                    <input name="k_name_input" id="k_name_input" type="text" value="Kate" />
+                    <input name="k-name-input" id="k-name-input" type="text" value="Kate" />
                 </td>
                 <td>Ids:</td>
                 <td>
-                    <input name="k_ids_input" id="k_ids_input" type="text" value="20" />
+                    <input name="k-ids-input" id="k-ids-input" type="text" value="20" />
                 </td>
             </tr>
         </table>
-        <button type="button" id="show_button"
-                onclick="trigger_process(file_to_read)"
-                class="hide flat_buttons"
+        <button type="button" id="show-button"
+                class="hide flat-buttons"
                 disabled>Show Data!</button>
 
         <div class="hide">
-        <section id="graph0_wrapper">
-            <h2 id="num_msgs">Message Statistics Summary</h2>
+        <section id="graph0-wrapper">
+            <h2>Message Statistics Summary</h2>
             <svg id="graph0" width="760"  height="20" >
-                <g id="graph0_pie" transform="translate(150, 120)">
-                    <g id="graph0_pie_pie" />
-                    <g id="graph0_pie_labels" />
-                    <g id="graph0_pie_annotations" />
+                <g id="graph0-pie" transform="translate(150, 120)">
+                    <g id="graph0-pie-pie" />
+                    <g id="graph0-pie-labels" />
+                    <g id="graph0-pie-annotations" />
                 </g>
-                <g id="graph0_word" transform="translate(50, 290)" >
-                    <line id="graph0_word_line"/>
-                    <g id="graph0_word_whisk">
-                        <rect id="graph0_word_box"/>
+                <g id="graph0-word" transform="translate(50, 290)" >
+                    <line id="graph0-word-line"/>
+                    <g id="graph0-word-whisk">
+                        <rect id="graph0-word-box"/>
                     </g>
-                    <g id="graph0_word_labels" />
-                    <text id="graph0_word_annotations" />
-                    <line id="graph0_word_zoom_connection"/>
-                    <line id="graph0_word_zoom_connection2"/>
-                    <line id="graph0_word_zoom_line"/>
-                    <g id="graph0_word_zoom_whisk">
-                        <rect id="graph0_word_zoom_box"/>
+                    <g id="graph0-word-labels" />
+                    <text id="graph0-word-annotations" />
+                    <line id="graph0-word-zoom-connection"/>
+                    <line id="graph0-word-zoom-connection2"/>
+                    <line id="graph0-word-zoom-line"/>
+                    <g id="graph0-word-zoom-whisk">
+                        <rect id="graph0-word-zoom-box"/>
                     </g>
-                    <g id="graph0_word_zoom_labels" />
+                    <g id="graph0-word-zoom-labels" />
                 </g>
-                <g id="graph0_char" transform="translate(50, 460)" >
-                    <line id="graph0_char_line"/>
-                    <g id="graph0_char_whisk">
-                        <rect id="graph0_char_box"/>
+                <g id="graph0-char" transform="translate(50, 460)" >
+                    <line id="graph0-char-line"/>
+                    <g id="graph0-char-whisk">
+                        <rect id="graph0-char-box"/>
                     </g>
-                    <g id="graph0_char_labels" />
-                    <text id="graph0_char_annotations" />
-                    <line id="graph0_char_zoom_connection"/>
-                    <line id="graph0_char_zoom_connection2"/>
-                    <line id="graph0_char_zoom_line"/>
-                    <g id="graph0_char_zoom_whisk">
-                        <rect id="graph0_char_zoom_box"/>
+                    <g id="graph0-char-labels" />
+                    <text id="graph0-char-annotations" />
+                    <line id="graph0-char-zoom-connection"/>
+                    <line id="graph0-char-zoom-connection2"/>
+                    <line id="graph0-char-zoom-line"/>
+                    <g id="graph0-char-zoom-whisk">
+                        <rect id="graph0-char-zoom-box"/>
                     </g>
-                    <g id="graph0_char_zoom_labels" />
+                    <g id="graph0-char-zoom-labels" />
                 </g>
             </svg>
-            <div id="graph0_avgs">
+            <div id="graph0-avgs">
             </div>
         </section>
 
-        <div id="graph1_wrapper" >
-            <h2 id="num_msgs">Total Messages Sent each hour</h2>
+        <div id="graph1-wrapper" >
+            <h2>Total Messages Sent each hour</h2>
             <svg id="graph1" width="1300"  height="20">
-                <g id="graph1_bars" transform="translate(28, 0)" />
-                <g id="graph1_labels" transform="translate(28, 0)" />
-                <g id="graph1_axis_left" />
+                <g id="graph1-bars" transform="translate(28, 0)" />
+                <g id="graph1-labels" transform="translate(28, 0)" />
+                <g id="graph1-axis-left" />
             </svg>
 
             <br/>
-            <button type="button" onclick="day_select(-1)">All</button>
-            <button type="button" onclick="day_select(1)">Mon</button>
-            <button type="button" onclick="day_select(2)">Tues</button>
-            <button type="button" onclick="day_select(3)">Wed</button>
-            <button type="button" onclick="day_select(4)">Thur</button>
-            <button type="button" onclick="day_select(5)">Fri</button>
-            <button type="button" onclick="day_select(6)">Sat</button>
-            <button type="button" onclick="day_select(0)">Sun</button>
+            <button type="button" id="day-select-all">All</button>
+            <button type="button" id="day-select-mon">Mon</button>
+            <button type="button" id="day-select-tues">Tues</button>
+            <button type="button" id="day-select-wed">Wed</button>
+            <button type="button" id="day-select-thur">Thur</button>
+            <button type="button" id="day-select-fri">Fri</button>
+            <button type="button" id="day-select-sat">Sat</button>
+            <button type="button" id="day-select-sun">Sun</button>
         </div>
 
-        <div id="graph2_wrapper" >
+        <div id="graph2-wrapper" >
             <h2> Message Count over time</h2>
             <svg id="graph2" width="760"  height="20" >
-                <g id="graph2_bars" transform="translate(28, 0)" />
-                <g id="graph2_labels" transform="translate(28, 0)" />
-                <path id="graph2_path" transform="translate(28, 0)" />
-                <g id="graph2_axis_left" />
+                <g id="graph2-bars" transform="translate(28, 0)" />
+                <g id="graph2-labels" transform="translate(28, 0)" />
+                <path id="graph2-path" transform="translate(28, 0)" />
+                <g id="graph2-axis-left" />
             </svg>
             <br/>
             <label for="x_day_avg">Number of Days to average</label>
-            <input type="number" id="graph2_x_day_avg" name="x_day_avg" value="7" min="3" step="2" />
+            <input type="number" id="graph2-x-day-avg" name="x_day_avg" value="7" min="3" step="2" />
         </div>
 
-        <div id="graph3_wrapper" >
+        <div id="graph3-wrapper" >
             <h2> Word Use Difference</h2>
             <p> The closer to either extreme, the more likely words listed would used by that person.
                 Words near the center are equally likely to be used by either person.</p>
             <svg id="graph3">
-                <g id="graph3_bars" transform="translate(100, 60)" />
-                <g id="graph3_labels" transform="translate(100, 60)" />
-                <g id="graph3_annotations"  transform="translate(60, 55)" />
-                <g id="graph3_axis_bottom" transform="translate(60, 60)" />
+                <g id="graph3-bars" transform="translate(100, 60)" />
+                <g id="graph3-labels" transform="translate(100, 60)" />
+                <g id="graph3-annotations"  transform="translate(60, 55)" />
+                <g id="graph3-axis-bottom" transform="translate(60, 60)" />
             </svg>
         </div>
 
-        <section id="graph4_wrapper" >
+        <section id="graph4-wrapper" >
             <h2> Top used Emoji's</h2>
             <p> Mouseover each to see the number of times it was used. </p>
         </section>
         </div>
 
-        <div class="u-container c-footer__container">
+        <div class="u-container c-footer-container">
             <p>&copy; Bryce Willey 2019</p>
             <p>
                 <a href="mailto:bryce.steven.willey@gmail.com">bryce.steven.willey@gmail.com</a>
@@ -161,54 +156,10 @@
         </div>
     </body>
 
-    <script>
-     var file_to_read;
-     var file_type;
-     var address_in = 171;
-     var b_name = 'Bob';
-     var b_ids = [23];
-     var k_name = 'Kate';
-     var k_ids = [20];
-     var time_of_days = [];
-     var days_in_year = [];
+    <script type="text/javascript" src="lib/moment.js"></script>
+    <script type="text/javascript" src="lib/d3.min.js"></script>
+    <script type="module" src="src/math.js"></script>
+    <script type="module" src="src/graphs.js"></script>
 
-     function refresh_show() {
-         if (k_ids.length != 0 && b_ids.length != 0 && b_name.length != 0 && k_name.length != 0) {
-             document.getElementById('show_button').disabled = false;
-         } else {
-             document.getElementById('show_button').disabled = true;
-         }
-     }
-
-     document.getElementById('address_input').oninput = function() {
-         address_in = parseInt(document.getElementById('thread_input').value, 10);
-         refresh_show();
-     };
-
-     document.getElementById('k_ids_input').oninput = function() {
-         k_ids = string_to_int_array(document.getElementById('k_ids_input').value);
-         refresh_show();
-     };
-
-     document.getElementById('b_ids_input').oninput = function() {
-         b_ids = string_to_int_array(document.getElementById('b_ids_input').value);
-         refresh_show();
-     };
-
-     document.getElementById('b_name_input').oninput = function() {
-         b_name = document.getElementById('b_name_input').value;
-         refresh_show();
-     };
-
-     document.getElementById('k_name_input').oninput = function() {
-         k_name = document.getElementById('k_name_input').value;
-         refresh_show();
-     };
-
-     document.getElementById('graph2_x_day_avg').oninput = function() {
-         x_day_avg(document.getElementById('graph2_x_day_avg').value);
-     };
-
-     document.getElementById('file_select').addEventListener('change', handleFileSelect, false);
-    </script>
+    <script type="module" src="index.js"></script>
 </html>

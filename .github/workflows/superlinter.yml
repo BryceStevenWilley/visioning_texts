@@ -1,0 +1,31 @@
+name: Super-Linter
+
+# Run this workflow every time a new commit is pushed to the repository
+on: push
+
+jobs:
+  # Set the job key. This key is displayed as the job's name when there's no job name
+  super-lint:
+    # Name the job
+    name: Lint code base
+    # Set the machine to run on
+    runs-on: ubuntu-latest
+
+    steps:
+      # Checks out a copy of your repository on the ubuntu-latest machine
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      # Runs the Super-Linter action
+      - name: Run Super-linter
+        # https://github.com/marketplace/actions/super-linter
+        uses: github/super-linter@v3
+        env:
+          DEFAULT_BRANCH: master
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          FILTER_REGEX_EXCLUDE: .*/lib/.*
+          JAVASCRIPT_DEFAULT_STYLE: nothing
+          JAVASCRIPT_STYLE: nothing
+          VALIDATE_JAVASCRIPT_STANDARD: false
+          JAVASCRIPT_ES_CONFIG_FILE: .eslintrc.yml
+          CSS_FILE_NAME: .stylelintrc.json

@@ -2,9 +2,9 @@
 
 Pretty much what the title says. All javascript is executed locally in the browser, no of your data is sent anywhere, and you get some (in my opinion) pretty cool data visualizations of your conversations.
 
-Check it out live (still with nothing being sent out) at https://brycewilley.xyz/visioning_texts
+Check it out [live](https://brycewilley.xyz/visioning_texts) (still with nothing being sent out).
 
-For instructions on how to download your Signal/Whatsapp messages, see the [setup instructions](setup_instructions.html) (or live at https://brycewilley.xyz/setup_instructions.html).
+For instructions on how to download your Signal/Whatsapp messages, see the [setup instructions](setup_instructions.html) (or on the [live site](https://brycewilley.xyz/setup_instructions.html)).
 
 ## Installation
 
