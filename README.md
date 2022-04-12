@@ -1,6 +1,6 @@
 # Visioning Texts: A D3 project that (locally) visualizes statistics about your messages from Signal or Whatsapp
 
-Pretty much what the title says. All javascript is executed locally in the browser, no of your data is sent anywhere, and you get some (in my opinion) pretty cool data visualizations of your conversations.
+Pretty much what the title says. All JavaScript is executed locally in the browser, no of your data is sent anywhere, and you get some (in my opinion) pretty cool data visualizations of your conversations.
 
 Check it out [live](https://brycewilley.xyz/visioning_texts) (still with nothing being sent out).
 
@@ -8,7 +8,7 @@ For instructions on how to download your Signal/Whatsapp messages, see the [setu
 
 ## Installation
 
-* Download the repo (`git clone https://github.com/BryceStevenWilley/visioning_texts.git`)
+* Download the repository (`git clone https://github.com/BryceStevenWilley/visioning_texts.git`)
 * Open `index.html` in your browser
 * That's it!
 
