@@ -11,20 +11,26 @@
 
 body {
   font-family: "fira_sansregular", sans-serif;
-  background: #0090ea;
-  color: #fff;
+  background: #d4e0e3;
+  color: #3e154f;
 }
 
 h1,
 h2,
 h3,
 h4 {
-  color: #ffd90a;
+  color: #3e154f;
 }
+
+h2 {
+    font-size: 1.17em;
+    font-weight: bold;
+}
+
 
 a {
   text-decoration: underline;
-  color: #fff;
+  color: #3a752a;
 }
 
 .page-title {
@@ -39,7 +45,7 @@ a {
 }
 
 .c-footer-container a {
-  color: #ffd90a;
+  color: #3e154f;
 }
 
 .c-footer a:not(:first-of-type) {
@@ -58,9 +64,9 @@ a {
 
 button,
 input[type="button"] {
-  background-color: #11a1fb;
-  color: #fff;
-  border: 1px solid #fff;
+  background-color: #d4e0e3;
+  color: #3a752a;
+  border: 1px solid #3a752a;
   text-align: center;
   text-decoration: none;
 }
@@ -68,9 +74,9 @@ input[type="button"] {
 input[type="text"],
 input[type="number"],
 input[type="file"] {
-  background-color: #11a1fb;
-  color: #fff;
-  border: 1px solid #fff;
+  background-color: #d4e0e3;
+  color: #3a752a;
+  border: 1px solid #3a752a;
 }
 
 input[type="file"] {
@@ -78,9 +84,9 @@ input[type="file"] {
 }
 
 .custom-file-upload {
-  background-color: #11a1fb;
-  color: #fff;
-  border: 1px solid #fff;
+  background-color: #d4e0e3;
+  color: #3a752a;
+  border: 1px solid #3a752a;
   padding: 3px 5px;
   cursor: pointer;
 }

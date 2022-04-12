@@ -25,7 +25,7 @@ function set_graph_0_pie (totalsData, names) {
   const u = d3.select('#graph0-pie-pie').selectAll('path').data(arcData)
   u.enter().append('path').merge(u)
     .attr('d', arcGenerator)
-    .attr('stroke', 'white')
+    .attr('stroke', '#3e154f')
     .attr('fill', function (d, i) {
       return colors[names.indexOf(d.data.name)]
     })
@@ -33,7 +33,7 @@ function set_graph_0_pie (totalsData, names) {
 
   const t = d3.select('#graph0-pie-labels').selectAll('text').data(arcData)
   t.enter().append('text').merge(t)
-    .attr('fill', 'white')
+    .attr('fill', '#3e154f')
     .attr('text-anchor', 'middle')
     .each(function (d) {
       const centroid = arcGenerator.centroid(d)
@@ -79,17 +79,17 @@ function set_graph_0_whisk (stats, isZoomBar, mid, prevBars, elemId,
   d3.select(elemId + '-line')
     .attr('y1', mid).attr('y2', mid)
     .attr('x1', xScale(minBar)).attr('x2', xScale(maxBar))
-    .attr('stroke', 'white')
+    .attr('stroke', '#3e154f')
 
   if (prevBars.length !== 0) {
     d3.select(elemId + '-connection')
-      .attr('stroke', 'white')
+      .attr('stroke', '#3e154f')
       .attr('y1', prevBars[0]).attr('y2', mid)
       .attr('x1', prevBars[1][0] - 1)
       .attr('x2', stats.min - 2)
 
     d3.select(elemId + '-connection2')
-      .attr('stroke', 'white')
+      .attr('stroke', '#3e154f')
       .attr('y1', prevBars[0]).attr('y2', mid)
       .attr('x1', prevBars[1][1] - 1)
       .attr('x2', 700)
@@ -100,7 +100,7 @@ function set_graph_0_whisk (stats, isZoomBar, mid, prevBars, elemId,
     .attr('x', xScale(stats.q1))
     .attr('height', height)
     .attr('width', (xScale(stats.q3) - xScale(stats.q1)))
-    .attr('stroke', 'white')
+    .attr('stroke', '#3e154f')
     .attr('fill', color)
 
   const u = d3.select(elemId + '-whisk').selectAll('line').data([minBar,
@@ -110,7 +110,7 @@ function set_graph_0_whisk (stats, isZoomBar, mid, prevBars, elemId,
     .attr('y2', mid + height / 2)
     .attr('x1', function (d) { return xScale(d) })
     .attr('x2', function (d) { return xScale(d) })
-    .attr('stroke', 'white')
+    .attr('stroke', '#3e154f')
   u.exit().remove()
 
   let toAddDots = [stats.min, stats.max]
@@ -122,7 +122,7 @@ function set_graph_0_whisk (stats, isZoomBar, mid, prevBars, elemId,
     .attr('cy', mid)
     .attr('cx', function (d) { return xScale(d) })
     .attr('r', 3)
-    .attr('fill', 'white')
+    .attr('fill', '#3e154f')
   c.exit().remove()
 
   let labelData = [stats.min, minBar, stats.median, maxBar, stats.max]
@@ -134,14 +134,14 @@ function set_graph_0_whisk (stats, isZoomBar, mid, prevBars, elemId,
     .attr('x', function (d) { return xScale(d) })
     .attr('y', mid + height)
     .attr('text-anchor', 'middle')
-    .attr('fill', 'white')
+    .attr('fill', '#3e154f')
     .text(function (d) { return d })
   t.exit().remove()
 
   d3.select(elemId + '-annotations').text(description)
     .attr('y', mid - height)
     .attr('alignment-baseline', 'baseline')
-    .attr('fill', 'white')
+    .attr('fill', '#3e154f')
 
   if (prevBars.length === 0) {
     return [xScale(minBar), xScale(maxBar)]
@@ -235,7 +235,7 @@ function setGraph1Weekly (data, day) {
       return barScalePlace(d.texts) + 'px'
     })
     .attr('fill', function (d) {
-      return '#ffd90a'
+      return '#3e154f'
     })
   u.exit().remove()
 
@@ -246,7 +246,7 @@ function setGraph1Weekly (data, day) {
   t.enter()
     .append('text')
     .merge(t)
-    .attr('fill', 'white')
+    .attr('fill', '#3e154f')
     .attr('y', function (d, i) {
       return maxBarHeight + 15
     })
@@ -298,7 +298,7 @@ function setGraph2 (data) {
       return maxBarLength - barScale(d.texts) + 'px'
     })
     .attr('fill', function (d) {
-      return (d.date.getMonth() % 2 == 0) ? '#ffd90a' : 'grey'
+      return (d.date.getMonth() % 2 == 0) ? '#3e154f' : 'grey'
     })
   u.exit().remove()
 
@@ -308,7 +308,7 @@ function setGraph2 (data) {
   t.enter()
     .append('text')
     .merge(t)
-    .attr('fill', 'white')
+    .attr('fill', '#3e154f')
     .attr('x', function (d) {
       return d.day_count * width + 3
     })
@@ -374,7 +374,7 @@ function setGraph3Words (wordCountLess, names) {
   const diffScale = d3.scaleLinear().domain([-1, 1]).range([0, width])
   // const maxWordTotal = Math.max(...word_count_even_less.map(function (w) { return w[1] }))
   // const totalScale = d3.scaleLinear().domain([0, maxWordTotal]).range([height, 0])
-  const colorScale = d3.scaleLinear().domain([-1, 1]).range(['#ffd90a', 'white'])
+  const colorScale = d3.scaleLinear().domain([-1, 1]).range(['#3e154f', '#3a752a'])
 
   const t = d3.select('#graph3-labels')
     .selectAll('text')
@@ -401,7 +401,7 @@ function setGraph3Words (wordCountLess, names) {
   t2.enter()
     .append('text')
     .merge(t2)
-    .attr('fill', 'white')
+    .attr('fill', '#3e154f')
     .attr('text-anchor', 'middle')
     .attr('transform', function (d, i) {
       return 'translate(' + revScale((i - 0.5) * 2) + ',0)'
@@ -622,7 +622,7 @@ function xDayAvg (x) {
   d3.select('#graph2-path')
     .transition(trans)
     .attr('d', pathData)
-    .attr('stroke', '#66298c')
+    .attr('stroke', '#ffd90a')
     .attr('stroke-width', 2)
     .attr('fill', 'none')
 }
