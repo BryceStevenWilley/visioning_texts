@@ -33,7 +33,7 @@ function set_graph_0_pie (totalsData, names) {
 
   const t = d3.select('#graph0-pie-labels').selectAll('text').data(arcData)
   t.enter().append('text').merge(t)
-    .attr('fill', '#3e154f')
+    .attr('fill', 'white')
     .attr('text-anchor', 'middle')
     .each(function (d) {
       const centroid = arcGenerator.centroid(d)
@@ -51,7 +51,7 @@ function set_graph_0_pie (totalsData, names) {
 
   const t2 = d3.select('#graph0-pie-annotations').selectAll('text').data(arcData)
   t2.enter().append('text').merge(t2)
-    .attr('fill', 'white')
+    .attr('fill', '#3e154f')
     .attr('text-anchor', 'middle')
     .each(function (d) {
       const centroid = annotationArcGenerator.centroid(d)
@@ -64,7 +64,7 @@ function set_graph_0_pie (totalsData, names) {
   t2.exit().remove()
 }
 
-function set_graph_0_whisk (stats, isZoomBar, mid, prevBars, elemId,
+function set_graph_0_whisk (stats, largestText, isZoomBar, mid, prevBars, elemId,
   color, description) {
   const minBar = Math.max(stats.min, stats.q1 - 1.5 * stats.interQuantileRange)
   const maxBar = Math.min(stats.max, stats.q3 + 1.5 * stats.interQuantileRange)
@@ -121,8 +121,11 @@ function set_graph_0_whisk (stats, isZoomBar, mid, prevBars, elemId,
   c.enter().append('circle').merge(c)
     .attr('cy', mid)
     .attr('cx', function (d) { return xScale(d) })
-    .attr('r', 3)
+    .attr('r', 6)
     .attr('fill', '#3e154f')
+    .html(function(d) {
+      return `<title>${largestText}</title>`
+    })
   c.exit().remove()
 
   let labelData = [stats.min, minBar, stats.median, maxBar, stats.max]
@@ -152,20 +155,33 @@ function set_graph_0_whisk (stats, isZoomBar, mid, prevBars, elemId,
 
 function setGraph0 (data) {
   const totalsData = perPersonWordCount(data)
+  const largestData = largestPerPerson(data)
+  const largestChars = largestData.map(function (d) {
+    return d.largest_char_text
+  }).reduce(function (total, d) {
+    return total + "\n---\n" + d;
+  })
+  const largestWords = largestData.map(function (d) {
+    return d.largest_word_text
+  }).reduce(function (total, d) {
+    return total + "\n---\n" + d;
+  })
 
   set_graph_0_pie(totalsData, data.names)
 
   const justWords = totalsData.map(function (d) {
     return d.words
   }).reduce(function (total, d) {
-    return total.concat(d)
+    total.push(...d)
+    return total
   }, [])
   const wordStats = getStatistics(justWords)
 
   const justChars = totalsData.map(function (d) {
     return d.chars
   }).reduce(function (total, d) {
-    return total.concat(d)
+    total.push(...d)
+    return total
   }, [])
   const charStats = getStatistics(justChars)
 
@@ -177,21 +193,21 @@ function setGraph0 (data) {
     const bars = set_graph_0_whisk(wordStats, true, 0, [],
       '#graph0-word', 'green',
       'Words per text')
-    set_graph_0_whisk(wordStats, true, 75, [0, bars], '#graph0-word-zoom', 'green', '')
+    set_graph_0_whisk(wordStats, largestWords, true, 75, [0, bars], '#graph0-word-zoom', 'green', '')
   } else {
     tallHeight = 370
-    set_graph_0_whisk(wordStats, false, 0, [], '#graph0-word', 'green', 'Words per text')
+    set_graph_0_whisk(wordStats, largestWords, false, 0, [], '#graph0-word', 'green', 'Words per text')
   }
   d3.select('#graph0-char').attr('transform', `translate(50, ${tallHeight})`)
   if (charStats.max - charStats.q3 > 10 * charStats.interQuantileRange) {
     height += 100
-    const bars = set_graph_0_whisk(charStats, true, 0, [],
+    const bars = set_graph_0_whisk(charStats, largestChars, true, 0, [],
       '#graph0-char', 'green',
       'Characters per text')
-    set_graph_0_whisk(charStats, true, 75, [0, bars],
+    set_graph_0_whisk(charStats, largestChars, true, 75, [0, bars],
       '#graph0-char-zoom', 'green', '')
   } else {
-    set_graph_0_whisk(charStats, false, 0, [], '#graph0-char', 'green', 'Characters per text')
+    set_graph_0_whisk(charStats, largestChars, false, 0, [], '#graph0-char', 'green', 'Characters per text')
   }
 
   d3.select('#graph0')

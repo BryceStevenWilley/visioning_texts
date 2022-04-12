@@ -198,9 +198,12 @@ function wordSplit (row) {
 }
 
 function wordReduce (allWords, msg) {
-  return allWords.concat(msg.split(' ').filter(function (str) {
+  let msg_split = msg.split(' ').filter(function (str) {
     return str.length !== 0
-  }))
+  })
+  // https://uilicious.com/blog/javascript-array-push-is-945x-faster-than-array-concat/
+  allWords.push(...msg_split)
+  return allWords
 }
 
 function perPersonWordCount (data) {
@@ -222,6 +225,37 @@ function perPersonWordCount (data) {
       texts: onePerson.length,
       chars: chars,
       words: words
+    }
+  })
+}
+
+function largestPerPerson (data) {
+  return data.names.map(function (n) {
+    const onePerson = data.data.filter(function (row) {
+      return row.name === n
+    })
+    let largest_char_size = 0;
+    let largest_char_text = "";
+    let largest_word_size = 0;
+    let largest_word_text = "";
+    for (row of onePerson) {
+      if (row.BODY.length > largest_char_size) {
+        largest_char_size = row.BODY.length;
+        largest_char_text = row.BODY;
+      }
+      const tmp = wordSplit(row)
+      let word_len = tmp.split(' ').filter(function (str) {
+        return str.length !== 0
+      }).length
+      if (word_len > largest_word_size) {
+        largest_word_size = word_len;
+        largest_word_text = row.BODY;
+      }
+    }
+    return {
+      name: n,
+      largest_char_text: largest_char_text, 
+      largest_word_text: largest_word_text,
     }
   })
 }
@@ -296,7 +330,8 @@ function xyTimeOfDaySepPerson (data) {
       return histo
     }, allHours)
   }).reduce(function (total, item) {
-    return total.concat(item)
+    total.push(...item)
+    return total
   }, [])
 }
 
