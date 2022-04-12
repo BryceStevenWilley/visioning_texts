@@ -1,6 +1,6 @@
-import { GraphemeSplitter } from '../lib/grapheme-splitter.js'
+// import { GraphemeSplitter } from '../lib/grapheme-splitter.js'
 
-export function splitBK (data, bIds, kIds, bName, kName, addressId) {
+function splitBK (data, bIds, kIds, bName, kName, addressId) {
   const allIds = bIds.concat(kIds)
   const fullData = data.filter(function (row) {
     return allIds.includes(row.TYPE) && row.ADDRESS == addressId
@@ -24,7 +24,7 @@ export function splitBK (data, bIds, kIds, bName, kName, addressId) {
   return { names: [bName, kName], data: fullData }
 }
 
-export function splitBKFacebook (text) {
+function splitBKFacebook (text) {
   const json = JSON.parse(text)
   const names = json.participants.map((p) => p.name)
   const data = json.messages.filter((msg) => {
@@ -48,7 +48,7 @@ const braceFront = /^\[/
 const noBraceFront = /^/
 const braceBack = /\]/
 
-export function splitBKWhatsapp (text) {
+function splitBKWhatsapp (text) {
   let lines = text.split('\n').filter(function (d) { return d.length !== 0 })
   let useBraces = ''
   let dateSplit = '/'
@@ -203,7 +203,7 @@ function wordReduce (allWords, msg) {
   }))
 }
 
-export function perPersonWordCount (data) {
+function perPersonWordCount (data) {
   return data.names.map(function (n) {
     const onePerson = data.data.filter(function (row) {
       return row.name === n
@@ -226,7 +226,7 @@ export function perPersonWordCount (data) {
   })
 }
 
-export function getStatistics (justData) {
+function getStatistics (justData) {
   // Stats
   const dataSorted = justData.sort(d3.ascending)
   const q1 = d3.quantile(dataSorted, 0.25)
@@ -241,7 +241,7 @@ export function getStatistics (justData) {
   }
 }
 
-export function xyTimeOfDay (data) {
+function xyTimeOfDay (data) {
   const allTimes = []
   for (let i = 0; i < 24 * 7; i++) {
     allTimes.push({
@@ -260,7 +260,7 @@ export function xyTimeOfDay (data) {
   }, allTimes)
 }
 
-export function xyTimeFilter (data, day) {
+function xyTimeFilter (data, day) {
   if (day === -1) {
     const allTimes = []
     for (let i = 0; i < 24; i++) {
@@ -281,7 +281,7 @@ export function xyTimeFilter (data, day) {
   }
 }
 
-export function xyTimeOfDaySepPerson (data) {
+function xyTimeOfDaySepPerson (data) {
   return data.names.map(function (n) {
     const allHours = []
     for (let i = 0; i < 24; i++) {
@@ -334,14 +334,14 @@ function makeTimeHistogram (data, minVal, allDays) {
   }, allDays)
 }
 
-export function xyDayOfYear (data) {
+function xyDayOfYear (data) {
   const minMax = minMaxDate(data)
 
   const allDays = stepDates(minMax[0], minMax[1], 'both')
   return makeTimeHistogram(data.data, minMax[0], allDays)
 }
 
-export function wordOccurFull (data) {
+function wordOccurFull (data) {
   return data.names.map(function (n) {
     const wordOccur = data.data.filter(function (row) {
       return row.name == n
@@ -357,7 +357,7 @@ export function wordOccurFull (data) {
 
 const emojiRegex = /[\u{1f300}-\u{1f5ff}\u{1f900}-\u{1f9ff}\u{1f600}-\u{1f64f}\u{1f680}-\u{1f6ff}\u{2600}-\u{26ff}\u{2700}-\u{27bf}\u{1f1e6}-\u{1f1ff}\u{1f191}-\u{1f251}\u{1f004}\u{1f0cf}\u{1f170}-\u{1f171}\u{1f17e}-\u{1f17f}\u{1f18e}\u{3030}\u{2b50}\u{2b55}\u{2934}-\u{2935}\u{2b05}-\u{2b07}\u{2b1b}-\u{2b1c}\u{3297}\u{3299}\u{303d}\u{00a9}\u{00ae}\u{2122}\u{23f3}\u{24c2}\u{23e9}-\u{23ef}\u{25b6}\u{23f8}-\u{23fa}]/ug
 
-export function wordOccurLessDiff (wordOccurMap) {
+function wordOccurLessDiff (wordOccurMap) {
   const simpleWords = ['the', 'and', 'And', 'a', 'to', 'was', 'is', 'of', 'but',
     'my', 'like', 'this', 'think', 'if', 'all', 'she', 'going', 'her',
     'i', 'you', 'that', 'it', 'be']
@@ -411,7 +411,7 @@ export function wordOccurLessDiff (wordOccurMap) {
   return finalList
 }
 
-export function emojiFilter (wordOccurMap) {
+function emojiFilter (wordOccurMap) {
   const splitter = new GraphemeSplitter()
   return wordOccurMap.map(function (x) {
     const tmpMap = {}

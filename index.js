@@ -1,4 +1,4 @@
-import { handleFileSelect, refreshShow, triggerProcess, string2IntArray, xDayAvg, daySelect } from './src/graphs.js'
+// import { handleFileSelect, refreshShow, triggerProcess, string2IntArray, xDayAvg, daySelect } from './src/graphs.js'
 
 document.getElementById('show-button').onclick = () => triggerProcess(window.file_to_read)
 document.getElementById('file-select').addEventListener('change', handleFileSelect, false)

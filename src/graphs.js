@@ -2,12 +2,12 @@
 // <script type="text/javascript" src="lib/d3.min.js"></script>
 // In the main page html
 
-import {
-  splitBK, splitBKWhatsapp, splitBKFacebook, perPersonWordCount, getStatistics,
-  xyTimeOfDay, xyTimeFilter, xyDayOfYear, wordOccurFull, wordOccurLessDiff, emojiFilter
-} from './math.js'
+// import {
+//  splitBK, splitBKWhatsapp, splitBKFacebook, perPersonWordCount, getStatistics,
+//  xyTimeOfDay, xyTimeFilter, xyDayOfYear, wordOccurFull, wordOccurLessDiff, emojiFilter
+//} from './math.js'
 
-export function string2IntArray (inputStr) {
+function string2IntArray (inputStr) {
   return inputStr.split(',').filter((el) => el.length > 0) // .map((el) => Number(el))
 }
 
@@ -503,7 +503,7 @@ function getFileType (mimeType, fileName) {
   }
 }
 
-export function handleFileSelect (evt) {
+function handleFileSelect (evt) {
   if (window.File && window.FileReader && window.FileList && window.Blob) {
     const files = evt.target.files // FileList object
 
@@ -543,7 +543,7 @@ export function handleFileSelect (evt) {
   refreshShow()
 }
 
-export function refreshShow () {
+function refreshShow () {
   const bName = document.getElementById('b-name-input').value
   const kName = document.getElementById('k-name-input').value
   const bIds = string2IntArray(document.getElementById('b-ids-input').value)
@@ -555,7 +555,7 @@ export function refreshShow () {
   }
 }
 
-export function triggerProcess (f) {
+function triggerProcess (f) {
   d3.select('div').classed('hide', false)
 
   const reader = new FileReader()
@@ -593,11 +593,11 @@ export function triggerProcess (f) {
   reader.readAsText(f)
 }
 
-export function daySelect (day) {
+function daySelect (day) {
   setGraph1Weekly(window.time_of_days, day)
 }
 
-export function xDayAvg (x) {
+function xDayAvg (x) {
   const [maxBarLength, , barScale, , width] = getGraph2Placement()
 
   const trans = d3.transition()
