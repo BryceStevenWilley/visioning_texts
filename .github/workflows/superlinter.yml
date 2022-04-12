@@ -14,14 +14,16 @@ jobs:
     steps:
       # Checks out a copy of your repository on the ubuntu-latest machine
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
 
       # Runs the Super-Linter action
       - name: Run Super-linter
         # https://github.com/marketplace/actions/super-linter
-        uses: github/super-linter@v3
+        uses: github/super-linter@v4
         env:
-          DEFAULT_BRANCH: master
+          DEFAULT_BRANCH: main 
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           FILTER_REGEX_EXCLUDE: .*/lib/.*
           JAVASCRIPT_DEFAULT_STYLE: nothing
