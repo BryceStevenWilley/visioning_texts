@@ -14,3 +14,8 @@ For instructions on how to download your Signal/Whatsapp messages, see the [setu
 
 The project is entirely self contained, only two libraries are included: [d3](https://d3js.org) for all of the visualizations, and
  [grapheme-splitter](https://github.com/orling/grapheme-splitter) for handling emojis in text.
+
+## Preview of the project
+
+![An example of what Visioning Texts generates](https://github.com/BryceStevenWilley/visioning_texts/assets/6252212/f7f1462c-f84e-4924-aeb5-932d48cfe51f)
+
