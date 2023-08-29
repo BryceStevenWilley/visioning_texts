@@ -9,6 +9,17 @@
   font-style: normal;
 }
 
+body .instructions section {
+  max-width: 76rem;
+  margin-right: auto;
+  margin-left: auto;
+  font-size: 1.5rem;
+}
+
+body .instructions section p {
+  margin-bottom: 1.2rem;
+}
+
 body {
   font-family: "fira_sansregular", sans-serif;
   background: #d4e0e3;
@@ -23,7 +34,7 @@ h4 {
 }
 
 h2 {
-  font-size: 1.17em;
+  font-size: 1.3em;
   font-weight: bold;
 }
 
