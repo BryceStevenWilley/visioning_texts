@@ -49,17 +49,8 @@ a {
   padding: 20px;
 }
 
-.c-footer p {
-  line-height: 1;
-  font-size: 1.6rem;
-}
-
 .c-footer-container a {
   color: #3e154f;
-}
-
-.c-footer a:not(:first-of-type) {
-  margin-left: 2rem;
 }
 
 .c-footer-container {
